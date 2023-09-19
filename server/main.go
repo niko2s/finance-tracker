@@ -27,7 +27,7 @@ func main() {
 	router := gin.Default()
 
 	router.POST("/addUser", func(c *gin.Context) {
-		handlers.AddUser(c, database)
+		handlers.AddUser(c, userRepo)
 	})
 
 	router.GET("/users", func(c *gin.Context) {

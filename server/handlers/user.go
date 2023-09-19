@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"database/sql"
 	"finance-tracker-server/models"
 	"finance-tracker-server/repository"
 	"finance-tracker-server/services"
@@ -11,14 +10,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func AddUser(c *gin.Context, db *sql.DB) {
+func AddUser(c *gin.Context, ur *repository.UserRepository) {
 	var newUser models.User
 
 	if err := c.ShouldBindJSON(&newUser); err != nil {
 		log.Fatal(err)
 	}
 
-	err := services.AddUser(db, newUser)
+	err := services.AddUser(ur, newUser)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert user"})
 		log.Fatal(err)
@@ -27,7 +26,7 @@ func AddUser(c *gin.Context, db *sql.DB) {
 }
 
 func GetUsers(c *gin.Context, ur *repository.UserRepository) {
-	users, err := ur.GetAllUsers()
+	users, err := services.GetUser(ur)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch users"})
 		return

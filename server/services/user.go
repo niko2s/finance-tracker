@@ -1,11 +1,24 @@
 package services
 
 import (
-	"database/sql"
 	"finance-tracker-server/models"
+	"finance-tracker-server/repository"
+	"log"
 )
 
-func AddUser(db *sql.DB, newUser models.User) error {
-	_, err := db.Exec(`INSERT INTO users(username, email) VALUES ($1, $2)`, newUser.Username, newUser.Email)
+func AddUser(ur *repository.UserRepository, newUser models.User) error {
+	err := ur.AddUser(newUser)
+	if err != nil {
+		log.Fatal(err)
+	}
 	return err
+}
+
+func GetUser(ur *repository.UserRepository) ([]models.User, error) {
+	users, err := ur.GetAllUsers()
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	return users, nil
 }

@@ -39,3 +39,8 @@ func (ur *UserRepository) GetAllUsers() ([]models.User, error) {
 
 	return users, nil
 }
+
+func (ur *UserRepository) AddUser(newUser models.User) error {
+	_, err := ur.db.Exec(`INSERT INTO users(username, email) VALUES ($1, $2)`, newUser.Username, newUser.Email)
+	return err
+}
