@@ -13,6 +13,13 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 	return &UserRepository{db}
 }
 
+func (ur *UserRepository) GetUserByEmailAndPassword(email string, password string) (int, error) {
+	var id int
+	err := ur.db.QueryRow(`SELECT id FROM users WHERE email=$1 AND password=$2`, email, password).Scan(&id)
+
+	return id, err
+}
+
 func (ur *UserRepository) GetAllUsers() ([]models.User, error) {
 	rows, err := ur.db.Query(`SELECT id, username, email, balance FROM users`)
 	if err != nil {
@@ -41,6 +48,6 @@ func (ur *UserRepository) GetAllUsers() ([]models.User, error) {
 }
 
 func (ur *UserRepository) AddUser(newUser models.User) error {
-	_, err := ur.db.Exec(`INSERT INTO users(username, email) VALUES ($1, $2)`, newUser.Username, newUser.Email)
+	_, err := ur.db.Exec(`INSERT INTO users(username, email, password) VALUES ($1, $2, $3)`, newUser.Username, newUser.Email, newUser.Password)
 	return err
 }

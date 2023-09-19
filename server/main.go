@@ -26,12 +26,16 @@ func main() {
 
 	router := gin.Default()
 
-	router.POST("/addUser", func(c *gin.Context) {
-		handlers.AddUser(c, userRepo)
-	})
-
 	router.GET("/users", func(c *gin.Context) {
 		handlers.GetUsers(c, userRepo)
+	})
+
+	router.POST("/login", func(c *gin.Context) {
+		handlers.LogIn(c, userRepo)
+	})
+
+	router.POST("/addUser", func(c *gin.Context) {
+		handlers.AddUser(c, userRepo)
 	})
 
 	router.Run(":8080")

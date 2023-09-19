@@ -6,8 +6,9 @@ import (
 
 type User struct {
 	ID       string `json:"id"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
+	Username string `json:"username" binding:"required"`
+	Email    string `json:"email" binding:"required"`
+	Password string `json:"password" binding:"required"`
 	Balance  int    `json:"balance"`
 }
 
@@ -18,6 +19,7 @@ func CreateSchema(db *sql.DB) error {
 		 id SERIAL PRIMARY KEY,
 		 username VARCHAR(50) NOT NULL,
 		 email VARCHAR(100) NOT NULL,
+		 password VARCHAR(20) NOT NULL,
 		 balance INTEGER DEFAULT 0
 	 );`
 

@@ -10,6 +10,24 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func LogIn(c *gin.Context, ur *repository.UserRepository) {
+	var login models.Login
+
+	if err := c.ShouldBindJSON(&login); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad request, email and password required"})
+		return
+	}
+
+	token, err := services.LogIn(ur, login.Email, login.Password)
+
+	if err != nil {
+		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, token)
+}
+
 func AddUser(c *gin.Context, ur *repository.UserRepository) {
 	var newUser models.User
 
