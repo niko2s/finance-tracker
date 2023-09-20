@@ -27,9 +27,7 @@ func CreateToken(id int) (string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user": id,
-		"RegisteredClaims": jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(10 * time.Minute)),
-		},
+		"exp":  jwt.NewNumericDate(time.Now().Add(10 * time.Minute)),
 	})
 
 	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))

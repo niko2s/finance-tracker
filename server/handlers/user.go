@@ -25,6 +25,14 @@ func LogIn(c *gin.Context, ur *repository.UserRepository) {
 		return
 	}
 
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "Authorization",
+		Value:    token,
+		Path:     "/",
+		Secure:   false,
+		HttpOnly: true,
+	})
+
 	c.JSON(http.StatusOK, token)
 }
 

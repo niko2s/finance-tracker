@@ -6,12 +6,12 @@ import (
 	"finance-tracker-server/middleware"
 	"finance-tracker-server/models"
 	"finance-tracker-server/repository"
+	"github.com/gin-gonic/gin"
 
+	"github.com/gin-contrib/cors"
+	"github.com/joho/godotenv"
 	//"finance-tracker-server/services"
 	"log"
-
-	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -26,6 +26,12 @@ func main() {
 	}
 
 	router := gin.Default()
+
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{"http://localhost:5173"} // Replace with your frontend application's URL
+	config.AllowCredentials = true
+
+	router.Use(cors.New(config))
 
 	router.POST("/login", func(c *gin.Context) {
 		handlers.LogIn(c, userRepo)
