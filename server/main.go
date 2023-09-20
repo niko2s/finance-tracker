@@ -3,6 +3,7 @@ package main
 import (
 	"finance-tracker-server/db"
 	"finance-tracker-server/handlers"
+	"finance-tracker-server/middleware"
 	"finance-tracker-server/models"
 	"finance-tracker-server/repository"
 
@@ -26,10 +27,6 @@ func main() {
 
 	router := gin.Default()
 
-	router.GET("/users", func(c *gin.Context) {
-		handlers.GetUsers(c, userRepo)
-	})
-
 	router.POST("/login", func(c *gin.Context) {
 		handlers.LogIn(c, userRepo)
 	})
@@ -37,6 +34,14 @@ func main() {
 	router.POST("/addUser", func(c *gin.Context) {
 		handlers.AddUser(c, userRepo)
 	})
+
+	auth := router.Group("/")
+	auth.Use(middleware.AuthRequired())
+	{
+		auth.GET("/users", func(c *gin.Context) {
+			handlers.GetUsers(c, userRepo)
+		})
+	}
 
 	router.Run(":8080")
 }
