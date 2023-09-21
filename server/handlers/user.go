@@ -6,6 +6,7 @@ import (
 	"finance-tracker-server/services"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,7 +19,7 @@ func LogIn(c *gin.Context, ur *repository.UserRepository) {
 		return
 	}
 
-	token, err := services.LogIn(ur, login.Email, login.Password)
+	token, id, err := services.LogIn(ur, login.Email, login.Password)
 
 	if err != nil {
 		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
@@ -33,7 +34,7 @@ func LogIn(c *gin.Context, ur *repository.UserRepository) {
 		HttpOnly: true,
 	})
 
-	c.JSON(http.StatusOK, token)
+	c.JSON(http.StatusOK, id)
 }
 
 func AddUser(c *gin.Context, ur *repository.UserRepository) {
@@ -43,6 +44,9 @@ func AddUser(c *gin.Context, ur *repository.UserRepository) {
 		log.Fatal(err)
 	}
 
+	//check if username&email unique
+	//no @ in username
+
 	err := services.AddUser(ur, newUser)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert user"})
@@ -51,8 +55,20 @@ func AddUser(c *gin.Context, ur *repository.UserRepository) {
 	c.JSON(http.StatusOK, gin.H{"message": "User added!"})
 }
 
+func GetUser(c *gin.Context, ur *repository.UserRepository) {
+	userId := c.Param("id")
+	intId, _ := strconv.Atoi(userId)
+	user, err := services.GetUserById(ur, intId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch users"})
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
+}
+
 func GetUsers(c *gin.Context, ur *repository.UserRepository) {
-	users, err := services.GetUser(ur)
+	users, err := services.GetUsers(ur)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch users"})
 		return

@@ -11,16 +11,16 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func LogIn(ur *repository.UserRepository, email string, password string) (string, error) {
-	id, err := ur.GetUserByEmailAndPassword(email, password)
+func LogIn(ur *repository.UserRepository, email string, password string) (string, int, error) {
+	user, err := ur.GetUserByEmailAndPassword(email, password)
 	if err != nil {
 		//wrong email/password
 		log.Printf("Error getting user by email and password: %v", err)
-		return "", errors.New("invalid email or password")
+		return "", 0, errors.New("invalid email or password")
 	}
 
-	token, err := CreateToken(id) // error handled in func, just forward to handler
-	return token, err
+	token, err := CreateToken(user.ID) // error handled in func, just forward to handler
+	return token, user.ID, err
 }
 
 func CreateToken(id int) (string, error) {
@@ -47,7 +47,16 @@ func AddUser(ur *repository.UserRepository, newUser models.User) error {
 	return err
 }
 
-func GetUser(ur *repository.UserRepository) ([]models.User, error) {
+func GetUserById(ur *repository.UserRepository, userId int) (models.User, error) {
+	user, err := ur.GetUserById(userId)
+	if err != nil {
+		log.Fatal(err)
+		return models.User{}, err
+	}
+	return user, nil
+}
+
+func GetUsers(ur *repository.UserRepository) ([]models.User, error) {
 	users, err := ur.GetAllUsers()
 	if err != nil {
 		log.Fatal(err)

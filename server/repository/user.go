@@ -13,11 +13,18 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 	return &UserRepository{db}
 }
 
-func (ur *UserRepository) GetUserByEmailAndPassword(email string, password string) (int, error) {
-	var id int
-	err := ur.db.QueryRow(`SELECT id FROM users WHERE email=$1 AND password=$2`, email, password).Scan(&id)
+func (ur *UserRepository) GetUserByEmailAndPassword(email string, password string) (models.User, error) {
+	var user models.User
+	err := ur.db.QueryRow(`SELECT * FROM users WHERE email=$1 AND password=$2`, email, password).Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Balance)
 
-	return id, err
+	return user, err
+}
+
+func (ur *UserRepository) GetUserById(id int) (models.User, error) {
+	var user models.User
+	err := ur.db.QueryRow(`SELECT * FROM users WHERE id=$1`, id).Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Balance)
+
+	return user, err
 }
 
 func (ur *UserRepository) GetAllUsers() ([]models.User, error) {
@@ -32,7 +39,7 @@ func (ur *UserRepository) GetAllUsers() ([]models.User, error) {
 	for rows.Next() {
 		var u models.User
 
-		err := rows.Scan(&u.ID, &u.Username, &u.Email, &u.Balance)
+		err := rows.Scan(&u.ID, &u.Username, &u.Email, &u.Password, &u.Balance)
 		if err != nil {
 			return nil, err
 		}

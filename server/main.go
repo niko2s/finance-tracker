@@ -44,6 +44,10 @@ func main() {
 	auth := router.Group("/")
 	auth.Use(middleware.AuthRequired())
 	{
+		auth.GET("/user/:id", func(c *gin.Context) {
+			handlers.GetUser(c, userRepo)
+		})
+
 		auth.GET("/users", func(c *gin.Context) {
 			handlers.GetUsers(c, userRepo)
 		})
