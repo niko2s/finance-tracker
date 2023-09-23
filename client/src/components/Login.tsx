@@ -2,14 +2,18 @@ import React, { useState } from "react";
 import { User } from "../types";
 import { useUser } from "./context/UserContext";
 
+//maybe refactor into two components
 function Login() {
   const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const {setUser} = useUser()
-  
+  //useState to display (error-) message
+
+  const { setUser } = useUser();
+
   const api = "http://localhost:8080";
 
   const getUser = async (id: number) => {
@@ -20,6 +24,7 @@ function Login() {
       });
 
       if (!response.ok) {
+        //add proper error handling
         throw new Error("Network response not 200");
       }
 
@@ -50,6 +55,7 @@ function Login() {
       });
 
       if (!response.ok) {
+        //add proper error handling
         throw new Error("Network response not 200");
       }
 
@@ -57,6 +63,35 @@ function Login() {
       console.log("First userdata: " + userData);
 
       await getUser(userData);
+    } catch (error) {
+      console.error("Fetch error:", error);
+    }
+  };
+
+  const register = async () => {
+    const registerBody = {
+      username,
+      email,
+      password,
+    };
+    const jsonRegisterBody = JSON.stringify(registerBody);
+
+    try {
+      const response = await fetch(api + "/addUser", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: jsonRegisterBody,
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response not 200");
+      }
+
+      const userData = await response.json();
+      console.log("response:" + userData);
     } catch (error) {
       console.error("Fetch error:", error);
     }
@@ -72,7 +107,7 @@ function Login() {
     if (isLogin) {
       login();
     } else {
-      //register
+      register();
     }
   };
 
@@ -87,6 +122,23 @@ function Login() {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <input type="hidden" name="remember" value="true" />
           <div className="rounded-md shadow-sm -space-y-px">
+            <div hidden={isLogin}>
+              <label htmlFor="email" className="sr-only">
+                Email
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="text"
+                autoComplete="email"
+                required={!isLogin}
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+
             <div>
               <label htmlFor="username" className="sr-only">
                 Username
