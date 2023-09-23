@@ -1,12 +1,15 @@
 import React, { useState } from "react";
-import { LoginProps, User } from "../types";
+import { User } from "../types";
+import { useUser } from "./context/UserContext";
 
-function Login({setUser}:LoginProps) {
+function Login() {
   const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
+  const {setUser} = useUser()
+  
   const api = "http://localhost:8080";
 
   const getUser = async (id: number) => {

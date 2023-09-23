@@ -1,23 +1,19 @@
-import { useState } from "react";
 import "./App.css";
 import Login from "./components/Login";
-import { User } from "./types";
+import UserProfile from "./components/UserProfile";
+import { useUser } from "./components/context/UserContext";
 
 function App() {
-  const [user, setUser] = useState<User | undefined>();
+  const { user } = useUser(); // Use the hook to get user from context
+
+  //use effect here to fetch user with cookie if cookie exists !?
+  //also add refresh token 
 
   return (
     <>
       <p className="text-5xl text-center bg-blue-200">Finance Tracker</p>
-      {!user && <Login setUser={setUser} />}
-
-      {!!user && (
-        <div className="bg-green-200">
-          <p>Your profile</p>
-          <p>Username: {user.username}</p>
-          <p>Balance: {user.balance}</p>
-        </div>
-      )}
+      {!user && <Login />}
+      {!!user && <UserProfile />}
     </>
   );
 }
