@@ -8,6 +8,13 @@ export interface User {
   balance: number;
 }
 
+export interface ExpenseCategory {
+  id: number;
+  name: string;
+  total: number;
+  userId: number;
+}
+
 export interface LoginResponse {
   id: number;
   error: string;
@@ -26,5 +33,5 @@ export interface AddFormProps {
   title: string;
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   status: string;
-  children: React.ReactNode
+  children: React.ReactNode;
 }
