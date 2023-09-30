@@ -4,11 +4,9 @@ import (
 	"finance-tracker-server/models"
 	"finance-tracker-server/repository"
 	"finance-tracker-server/services"
+	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
-	"strconv"
-
-	"github.com/gin-gonic/gin"
 )
 
 func LogIn(c *gin.Context, ur *repository.UserRepository) {
@@ -56,8 +54,8 @@ func AddUser(c *gin.Context, ur *repository.UserRepository) {
 }
 
 func GetUser(c *gin.Context, ur *repository.UserRepository) {
-	userId := c.Param("id")
-	intId, _ := strconv.Atoi(userId)
+	userId, _ := c.Get("userId")
+	intId := int(userId.(float64))
 	user, err := services.GetUserById(ur, intId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch users"})

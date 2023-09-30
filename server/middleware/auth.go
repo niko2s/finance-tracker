@@ -35,6 +35,7 @@ func AuthRequired() gin.HandlerFunc {
 
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			id := claims["user"].(float64)
+			c.Set("userId", id)
 
 			// refresh auth token in cookies every successful request
 			newTokenString, err := services.CreateToken(int(id))

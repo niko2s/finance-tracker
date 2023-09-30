@@ -19,9 +19,9 @@ function Login() {
 
   const api = "http://localhost:8080";
 
-  const getUser = async (id: number) => {
+  const getUser = async () => {
     try {
-      const response = await fetch(api + `/user/${id}`, {
+      const response = await fetch(api + `/user`, {
         method: "GET",
         credentials: "include",
       });
@@ -62,10 +62,10 @@ function Login() {
         throw new Error("Network response not 200");
       }
 
-      const userData = await response.json();
-      console.log("First userdata: " + userData);
+      //const userData = await response.json();
+      //console.log("First userdata: " + userData);
 
-      await getUser(userData);
+      await getUser();
     } catch (error) {
       console.error("Fetch error:", error);
     }
