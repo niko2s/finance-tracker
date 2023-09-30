@@ -21,3 +21,10 @@ export interface UserContextProps {
 export interface UserProviderProps {
   children: ReactNode;
 }
+
+export interface AddFormProps {
+  title: string;
+  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  status: string;
+  children: React.ReactNode
+}

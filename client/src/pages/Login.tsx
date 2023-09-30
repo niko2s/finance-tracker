@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { User } from "../types";
-import { useUser } from "./context/UserContext";
+import { useUser } from "../components/context/UserContext";
+import { useNavigate } from "react-router-dom";
 
 //maybe refactor into two components
 function Login() {
@@ -9,8 +10,10 @@ function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   //useState to display (error-) message
+  //interface for ^ message, e.g. msg, color, ...
 
   const { setUser } = useUser();
 
@@ -31,7 +34,7 @@ function Login() {
       const userData = (await response.json()) as User;
 
       setUser(userData);
-      console.log("Second user data: " + userData);
+      navigate('/home')
     } catch (error) {
       console.error("Fetch error:", error);
     }

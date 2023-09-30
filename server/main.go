@@ -4,7 +4,6 @@ import (
 	"finance-tracker-server/db"
 	"finance-tracker-server/handlers"
 	"finance-tracker-server/middleware"
-	"finance-tracker-server/models"
 	"finance-tracker-server/repository"
 	"github.com/gin-gonic/gin"
 
@@ -17,9 +16,10 @@ import (
 func main() {
 	godotenv.Load(".env")
 	database := db.ConnectToDb()
-	err := models.CreateSchema(database)
+	err := db.CreateSchema(database)
 
 	userRepo := repository.NewUserRepository(database)
+	expenseCategoryRepo := repository.NewExpenseCategoryRepository(database)
 
 	if err != nil {
 		log.Fatal("Error at CreateSchema: " + err.Error())
@@ -50,6 +50,10 @@ func main() {
 
 		auth.GET("/users", func(c *gin.Context) {
 			handlers.GetUsers(c, userRepo)
+		})
+
+		auth.POST("/addCategory", func(c *gin.Context) {
+			handlers.AddExpenseCategory(c, expenseCategoryRepo)
 		})
 	}
 
