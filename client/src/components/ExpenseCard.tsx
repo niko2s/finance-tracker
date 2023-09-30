@@ -1,17 +1,18 @@
 import { useState } from "react";
 import Modal from "./Modal";
+import { ExpenseCardProps } from "../types";
 
-const ExpenseCard = () => {
+const ExpenseCard = ({ name, total }: ExpenseCardProps) => {
   const [isModalOpen, setModalOpen] = useState(false);
 
   return (
-    <div className="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shado dark:bg-gray-800 dark:border-gray-700">
+    <div className="block max-w-sm p-6 border rounded-lg shadow bg-gray-800 border-gray-700">
       <div className="flex justify-between pb-6">
-        <p className="text-slate-200">Category</p>
-        <p className="text-slate-200">450/1000€</p>
+        <p className="text-slate-200">{name}</p>
+        <p className="text-slate-200">450/{total}€</p>
       </div>
 
-      <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+      <div className="w-full rounded-full h-2.5 bg-gray-700">
         <div
           className="bg-blue-600 h-2.5 rounded-full"
           style={{ width: "45%" }}

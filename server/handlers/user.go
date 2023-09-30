@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"finance-tracker-server/helpers"
 	"finance-tracker-server/models"
 	"finance-tracker-server/repository"
 	"finance-tracker-server/services"
@@ -54,9 +55,8 @@ func AddUser(c *gin.Context, ur *repository.UserRepository) {
 }
 
 func GetUser(c *gin.Context, ur *repository.UserRepository) {
-	userId, _ := c.Get("userId")
-	intId := int(userId.(float64))
-	user, err := services.GetUserById(ur, intId)
+	userId := helpers.GetUserIdFromContext(c)
+	user, err := services.GetUserById(ur, userId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch users"})
 		return

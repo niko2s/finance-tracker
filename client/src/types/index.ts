@@ -35,3 +35,8 @@ export interface AddFormProps {
   status: string;
   children: React.ReactNode;
 }
+
+export interface ExpenseCardProps {
+  name: string,
+  total: number,
+}

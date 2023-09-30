@@ -44,12 +44,18 @@ func main() {
 	auth := router.Group("/")
 	auth.Use(middleware.AuthRequired())
 	{
+		//user
 		auth.GET("/user", func(c *gin.Context) {
 			handlers.GetUser(c, userRepo)
 		})
 
 		auth.GET("/users", func(c *gin.Context) {
 			handlers.GetUsers(c, userRepo)
+		})
+
+		//expense categories
+		auth.GET("/categories", func(c *gin.Context) {
+			handlers.GetExpenseCategories(c, expenseCategoryRepo)
 		})
 
 		auth.POST("/addCategory", func(c *gin.Context) {
