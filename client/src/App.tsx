@@ -4,6 +4,7 @@ import Login from "./pages/Login";
 import UserProfile from "./pages/UserProfile";
 import AddExpenseCategory from "./pages/Add/AddExpenseCategory";
 import AddBalance from "./pages/Add/AddBalance";
+import ExpenseCategory from "./pages/ExpenseCategory";
 
 function App() {
   //use effect here to fetch user with cookie if cookie exists !?
@@ -20,6 +21,7 @@ function App() {
             <Route path="balance" element={<AddBalance />} />
             <Route path="category" element={<AddExpenseCategory />} />
         </Route>
+        <Route path="/category/:id" element={<ExpenseCategory/>}/>
       </Routes>
     </>
   );

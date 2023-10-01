@@ -23,7 +23,7 @@ const UserProfile = () => {
         }
 
         const data = (await response.json()) as ExpenseOverview[];
-        console.log(data)
+        console.log(data);
         setExpenseOverviews(data);
       } catch (error) {
         console.error("Failed to fetch data", error);
@@ -59,7 +59,12 @@ const UserProfile = () => {
         {expenseOverviews?.map((ec: ExpenseOverview) => {
           return (
             <li key={ec.category_id} className="w-96 h-48 mx-2">
-              <ExpenseCard category_id={ec.category_id} name={ec.name} total={ec.total} expense_sum={ec.expense_sum} />
+              <ExpenseCard
+                category_id={ec.category_id}
+                name={ec.name}
+                total={ec.total}
+                expense_sum={ec.expense_sum}
+              />
             </li>
           );
         })}

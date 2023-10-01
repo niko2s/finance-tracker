@@ -16,6 +16,13 @@ export interface ExpenseOverview {
   expense_sum: goSqlNullFloat64;
 }
 
+export interface Expense {
+  id: number,
+  title?: string | null,
+  value: number,
+  category: number
+}
+
 export interface LoginResponse {
   id: number;
   error: string;

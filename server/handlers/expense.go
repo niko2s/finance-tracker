@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 func AddExpense(c *gin.Context, er *repository.ExpenseRepository) {
@@ -23,4 +24,19 @@ func AddExpense(c *gin.Context, er *repository.ExpenseRepository) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Expense added!"})
+}
+
+func GetExpenses(c *gin.Context, er *repository.ExpenseRepository) {
+	id := c.Param("id")
+
+	intId, err := strconv.Atoi(id)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Parameter not an integer"})
+		return
+	}
+
+	expenses, err := services.GetExpensesByCategoryId(er, intId)
+
+	c.JSON(http.StatusOK, expenses)
 }

@@ -65,6 +65,11 @@ func main() {
 		})
 
 		//expense
+		//all expenses for a category
+		auth.GET("/category/:id", func(c *gin.Context) {
+			handlers.GetExpenses(c, expenseRepo)
+		})
+
 		auth.POST("/expense", func(c *gin.Context) {
 			handlers.AddExpense(c, expenseRepo)
 		})

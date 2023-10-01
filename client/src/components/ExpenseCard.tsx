@@ -2,6 +2,7 @@ import { useState } from "react";
 import Modal from "./Modal";
 import { ExpenseCardProps } from "../types";
 import AddForm from "./AddForm";
+import { Link } from "react-router-dom";
 
 const ExpenseCard = ({
   category_id,
@@ -93,9 +94,19 @@ const ExpenseCard = ({
         />
       </div>
 
-      <div className="flex justify-end pt-3">
+      <div className="flex justify-between pt-3">
+        <Link
+          to={`/category/${category_id}`}
+          className="text-slate-200 border border-solid border-slate-400 rounded
+        hover:bg-slate-700 p-2"
+        >
+          view tx
+        </Link>
         <button
-          onClick={() => setModalOpen(true)}
+          onClick={() => {
+            //so Link component does not get called
+            setModalOpen(true);
+          }}
           className="text-slate-200 border border-solid border-slate-400 rounded hover:bg-slate-700 p-2"
         >
           Add expense
@@ -109,9 +120,7 @@ const ExpenseCard = ({
           status={status}
           onClose={() => {
             setModalOpen(false);
-            setStatus(""),
-            setValue(""), 
-            setTitle("");
+            setStatus(""), setValue(""), setTitle("");
           }}
         >
           <label>

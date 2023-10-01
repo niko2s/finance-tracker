@@ -13,3 +13,11 @@ func AddExpense(er *repository.ExpenseRepository, newExpense models.Expense) err
 	}
 	return err
 }
+
+func GetExpensesByCategoryId(er *repository.ExpenseRepository, categoryId int) ([]models.Expense, error) {
+	expenses, err := er.GetAllExpensesByExpenseCategoryId(categoryId)
+	if err != nil {
+		log.Println(err)
+	}
+	return expenses, err
+}
