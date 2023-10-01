@@ -8,11 +8,12 @@ export interface User {
   balance: number;
 }
 
-export interface ExpenseCategory {
-  id: number;
+export interface ExpenseOverview {
+  user_id: number;
+  category_id: number;
   name: string;
   total: number;
-  userId: number;
+  expense_sum: goSqlNullFloat64;
 }
 
 export interface LoginResponse {
@@ -38,9 +39,15 @@ export interface AddFormProps {
 }
 
 export interface ExpenseCardProps {
-  id: number;
+  category_id: number;
   name: string;
   total: number;
+  expense_sum: goSqlNullFloat64;
+}
+
+export interface goSqlNullFloat64 {
+  Float64: number;
+  valid: boolean;
 }
 
 export interface ModalProps {

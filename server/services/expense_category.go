@@ -14,8 +14,8 @@ func AddExpenseCategory(ecr *repository.ExpenseCategoryRepository, newExpenseCat
 	return err
 }
 
-func GetAllExpenseCategoriesByUserId(userId int, ecr *repository.ExpenseCategoryRepository) ([]models.ExpenseCategory, error) {
-	categories, err := ecr.GetAllExpenseCategoriesByUserId(userId)
+func GetAllExpenseCategoriesByUserId(userId int, eor *repository.ExpenseOverviewRepository) ([]models.ExpenseOverview, error) {
+	categories, err := eor.GetAllExpenseCategoriesByUserId(userId)
 	if err != nil {
 		log.Println(err)
 	}

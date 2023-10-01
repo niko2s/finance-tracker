@@ -3,7 +3,12 @@ import Modal from "./Modal";
 import { ExpenseCardProps } from "../types";
 import AddForm from "./AddForm";
 
-const ExpenseCard = ({ id, name, total }: ExpenseCardProps) => {
+const ExpenseCard = ({
+  category_id,
+  name,
+  total,
+  expense_sum,
+}: ExpenseCardProps) => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [value, setValue] = useState("");
@@ -24,8 +29,8 @@ const ExpenseCard = ({ id, name, total }: ExpenseCardProps) => {
 
     const addExpenseBody = {
       title,
-      "value": Number(value),
-      "expense_category_id": id,
+      value: Number(value),
+      expense_category_id: category_id,
     };
 
     const jsonAddExpenseBody = JSON.stringify(addExpenseBody);
@@ -42,30 +47,49 @@ const ExpenseCard = ({ id, name, total }: ExpenseCardProps) => {
 
       if (!response.ok) {
         throw new Error("Network response not 200");
-
       } else {
         setStatus("Expense added successfully!");
-        setTitle("")
-        setValue("")
+        expense_sum.Float64 += Number(value);
+        setTitle("");
+        setValue("");
       }
-
     } catch (error) {
       setStatus("An error occured when adding a new expense");
       console.error("Fetch error:", error);
     }
   };
 
+  //calculate width and color for remaining budget progress bar
+  let color = "red";
+  let widthPercentage = 0;
+  if (expense_sum && total) {
+    const ratio = expense_sum.Float64 / total;
+    widthPercentage = Math.min(ratio * 100, 100);
+
+    if (ratio < 1) color = "green";
+    else if (ratio === 1) color = "blue";
+    // If ratio > 1, color remains red
+  }
+
   return (
     <div className="block max-w-sm p-6 border rounded-lg shadow bg-gray-800 border-gray-700">
       <div className="flex justify-between pb-6">
         <p className="text-slate-200">{name}</p>
-        <p className="text-slate-200">450/{total}€</p>
+        <p className="text-slate-200">
+          {expense_sum.Float64}/{total}€
+        </p>
       </div>
 
       <div className="w-full rounded-full h-2.5 bg-gray-700">
         <div
-          className="bg-blue-600 h-2.5 rounded-full"
-          style={{ width: "45%" }}
+          className={`h-2.5 rounded-full ${
+            color === "green"
+              ? "bg-green-600"
+              : color === "blue"
+              ? "bg-blue-600"
+              : "bg-red-600"
+          }`}
+          style={{ width: `${widthPercentage}%` }}
         />
       </div>
 
@@ -83,7 +107,12 @@ const ExpenseCard = ({ id, name, total }: ExpenseCardProps) => {
           title={`Add an expense to ${name}`}
           handleSubmit={handleSubmit}
           status={status}
-          onClose={() => setModalOpen(false)}
+          onClose={() => {
+            setModalOpen(false);
+            setStatus(""),
+            setValue(""), 
+            setTitle("");
+          }}
         >
           <label>
             Title

@@ -32,9 +32,9 @@ func AddExpenseCategory(c *gin.Context, ecr *repository.ExpenseCategoryRepositor
 	c.JSON(http.StatusOK, gin.H{"message": "User added!"})
 }
 
-func GetExpenseCategories(c *gin.Context, ecr *repository.ExpenseCategoryRepository) {
+func GetExpenseCategories(c *gin.Context, eor *repository.ExpenseOverviewRepository) {
 	userId := helpers.GetUserIdFromContext(c)
-	categories, err := services.GetAllExpenseCategoriesByUserId(userId, ecr)
+	categories, err := services.GetAllExpenseCategoriesByUserId(userId, eor)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch expense categories"})

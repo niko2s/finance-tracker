@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import ExpenseCard from "../components/ExpenseCard";
 import { useUser } from "../components/context/UserContext";
 import { Link } from "react-router-dom";
-import { ExpenseCategory } from "../types";
+import { ExpenseOverview } from "../types";
 
 const UserProfile = () => {
   const { user } = useUser();
-  const [expenseCategories, setExpenseCategories] = useState<ExpenseCategory[]>(
+  const [expenseOverviews, setExpenseOverviews] = useState<ExpenseOverview[]>(
     []
   );
 
@@ -22,8 +22,9 @@ const UserProfile = () => {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
-        const data = (await response.json()) as ExpenseCategory[];
-        setExpenseCategories(data);
+        const data = (await response.json()) as ExpenseOverview[];
+        console.log(data)
+        setExpenseOverviews(data);
       } catch (error) {
         console.error("Failed to fetch data", error);
       }
@@ -55,10 +56,10 @@ const UserProfile = () => {
       </div>
 
       <ul className="flex flex-wrap items-center justify-center">
-        {expenseCategories?.map((ec: ExpenseCategory) => {
+        {expenseOverviews?.map((ec: ExpenseOverview) => {
           return (
-            <li key={ec.id} className="w-96 h-48 mx-2">
-              <ExpenseCard id={ec.id} name={ec.name} total={ec.total} />
+            <li key={ec.category_id} className="w-96 h-48 mx-2">
+              <ExpenseCard category_id={ec.category_id} name={ec.name} total={ec.total} expense_sum={ec.expense_sum} />
             </li>
           );
         })}

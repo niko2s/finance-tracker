@@ -36,12 +36,32 @@ func CreateSchema(db *sql.DB) error {
 	createExpensesTableSQL := `
 	CREATE TABLE IF NOT EXISTS expenses (
 		id SERIAL PRIMARY KEY,
-		title VARCHAR(100) NOT NULL,
+		title VARCHAR(100),
 		value FLOAT NOT NULL,
 		expense_category_id INTEGER,
 		FOREIGN KEY (expense_category_id) REFERENCES expense_categories (id)
 	);`
 
 	_, err = db.Exec(createExpensesTableSQL)
+	if err != nil {
+		return err
+	}
+
+	createExpensesViewSQL := `
+    CREATE OR REPLACE VIEW ExpenseOverview AS
+    SELECT
+        ec.user_id AS user_id,
+        ec.id AS category_id,
+        ec.name AS category_name,
+        ec.total AS category_total,
+        SUM(e.value) AS sum_expenses
+    FROM
+        expense_categories ec
+    LEFT JOIN
+        expenses e ON ec.id = e.expense_category_id
+    GROUP BY
+        ec.id, ec.name;`
+
+	_, err = db.Exec(createExpensesViewSQL)
 	return err
 }

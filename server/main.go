@@ -21,6 +21,7 @@ func main() {
 	userRepo := repository.NewUserRepository(database)
 	expenseCategoryRepo := repository.NewExpenseCategoryRepository(database)
 	expenseRepo := repository.NewExpenseRepository(database)
+	expenseOverviewRepo := repository.NewExpenseOverviewRepository(database)
 
 	if err != nil {
 		log.Fatal("Error at CreateSchema: " + err.Error())
@@ -56,7 +57,7 @@ func main() {
 
 		//expense categories
 		auth.GET("/categories", func(c *gin.Context) {
-			handlers.GetExpenseCategories(c, expenseCategoryRepo)
+			handlers.GetExpenseCategories(c, expenseOverviewRepo)
 		})
 
 		auth.POST("/addCategory", func(c *gin.Context) {
