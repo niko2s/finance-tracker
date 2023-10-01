@@ -58,7 +58,7 @@ const UserProfile = () => {
         {expenseCategories?.map((ec: ExpenseCategory) => {
           return (
             <li key={ec.id} className="w-96 h-48 mx-2">
-              <ExpenseCard name={ec.name} total={ec.total} />
+              <ExpenseCard id={ec.id} name={ec.name} total={ec.total} />
             </li>
           );
         })}

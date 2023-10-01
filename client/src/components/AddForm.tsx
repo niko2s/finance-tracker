@@ -1,15 +1,29 @@
 import { AddFormProps } from "../types";
 import { useNavigate } from "react-router-dom";
 
-const AddForm = ({ title, handleSubmit, status, children }: AddFormProps) => {
+const AddForm = ({
+  title,
+  handleSubmit,
+  status,
+  children,
+  onClose,
+}: AddFormProps) => {
   const navigate = useNavigate();
+
+  const handleClick = () => {
+    if (onClose) {
+      onClose();
+    } else {
+      navigate(-1);
+    }
+  };
 
   return (
     <>
-      <div className="min-h-screen flex justify-center">
-        <div className="max-w-md w-full mt-10">
+      <div className="flex justify-center">
+        <div className="max-w-md w-full">
           <button
-            onClick={() => navigate(-1)}
+            onClick={handleClick}
             className="border border-solid rounded border-black p-1"
           >
             Go back

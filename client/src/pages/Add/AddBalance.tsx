@@ -18,31 +18,33 @@ const AddBalance = () => {
   };
 
   return (
-    <AddForm title="test" handleSubmit={handleSubmit} status ="">
-      <label>
-        Title:
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="border border-solid rounded "
-        />
-      </label>
-
-      <div className="pl-4">
-        <label className="inline-block">
-          Value (required):
+    <div className="mt-6">
+      <AddForm title="test" handleSubmit={handleSubmit} status="">
+        <label>
+          Title:
           <input
-            type="number"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            required
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
             className="border border-solid rounded "
           />
         </label>
-        <label>Current balance: {user?.balance}€</label>
-      </div>
-    </AddForm>
+
+        <div className="pl-4">
+          <label className="inline-block">
+            Value (required):
+            <input
+              type="number"
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              required
+              className="border border-solid rounded "
+            />
+          </label>
+          <label>Current balance: {user?.balance}€</label>
+        </div>
+      </AddForm>
+    </div>
   );
 };
 

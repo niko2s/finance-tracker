@@ -34,9 +34,16 @@ export interface AddFormProps {
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   status: string;
   children: React.ReactNode;
+  onClose?: () => void;
 }
 
 export interface ExpenseCardProps {
-  name: string,
-  total: number,
+  id: number;
+  name: string;
+  total: number;
+}
+
+export interface ModalProps {
+  isOpen: boolean;
+  children: React.ReactNode;
 }

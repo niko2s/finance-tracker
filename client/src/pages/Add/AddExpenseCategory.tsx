@@ -51,34 +51,37 @@ const AddExpenseCategory = () => {
     }
   };
   return (
-    <>
-    
-    <AddForm title="Add new expense category" handleSubmit={handleSubmit} status={status}>
-      <label>
-        Title (required):
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-          className="border border-solid rounded "
-        />
-      </label>
-
-      <div className="pl-4">
-        <label className="inline-block">
-          Limit to spend (required):
+    <div className="mt-6">
+      <AddForm
+        title="Add new expense category"
+        handleSubmit={handleSubmit}
+        status={status}
+      >
+        <label>
+          Title (required):
           <input
-            type="number"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
             required
             className="border border-solid rounded "
           />
         </label>
-      </div>
-    </AddForm>
-    </>
+
+        <div className="pl-4">
+          <label className="inline-block">
+            Limit to spend (required):
+            <input
+              type="number"
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              required
+              className="border border-solid rounded "
+            />
+          </label>
+        </div>
+      </AddForm>
+    </div>
   );
 };
 
