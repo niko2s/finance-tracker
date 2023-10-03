@@ -1,6 +1,7 @@
 import { useState } from "react";
 import AddForm from "../../components/AddForm";
 import { useUser } from "../../components/context/UserContext";
+import FormField from "../../components/FormField";
 
 const AddExpenseCategory = () => {
   const [title, setTitle] = useState("");
@@ -57,29 +58,20 @@ const AddExpenseCategory = () => {
         handleSubmit={handleSubmit}
         status={status}
       >
-        <label>
-          Title (required):
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-            className="border border-solid rounded "
-          />
-        </label>
-
-        <div className="pl-4">
-          <label className="inline-block">
-            Limit to spend (required):
-            <input
-              type="number"
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              required
-              className="border border-solid rounded "
-            />
-          </label>
-        </div>
+        <FormField
+          name="Title"
+          type="text"
+          required={true}
+          state={title}
+          setState={setTitle}
+        />
+        <FormField
+          name="Limit"
+          type="number"
+          required={true}
+          state={value}
+          setState={setValue}
+        />
       </AddForm>
     </div>
   );

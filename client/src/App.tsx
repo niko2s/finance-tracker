@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Link, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Login from "./pages/Login";
 import UserProfile from "./pages/UserProfile";
@@ -13,15 +13,19 @@ function App() {
 
   return (
     <>
-      <p className="text-5xl text-center bg-blue-200">Finance Tracker</p>
+      <div className="flex justify-center mt-6">
+        <Link to="/home" className="text-5xl text-secondary">
+          Finance Tracker
+        </Link>
+      </div>
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/home" element={<UserProfile />} />
         <Route path="/add">
-            <Route path="balance" element={<AddBalance />} />
-            <Route path="category" element={<AddExpenseCategory />} />
+          <Route path="balance" element={<AddBalance />} />
+          <Route path="category" element={<AddExpenseCategory />} />
         </Route>
-        <Route path="/category/:id" element={<ExpenseCategory/>}/>
+        <Route path="/category/:id" element={<ExpenseCategory />} />
       </Routes>
     </>
   );

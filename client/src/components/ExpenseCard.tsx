@@ -3,6 +3,7 @@ import Modal from "./Modal";
 import { ExpenseCardProps } from "../types";
 import AddForm from "./AddForm";
 import { Link } from "react-router-dom";
+import FormField from "./FormField";
 
 const ExpenseCard = ({
   category_id,
@@ -60,57 +61,49 @@ const ExpenseCard = ({
     }
   };
 
-  //calculate width and color for remaining budget progress bar
-  let color = "red";
-  let widthPercentage = 0;
+  //calculate width of progressbar
+  let withinLimit = true;
+  let widthPercentage = "0";
   if (expense_sum && total) {
     const ratio = expense_sum.Float64 / total;
-    widthPercentage = Math.min(ratio * 100, 100);
-
-    if (ratio < 1) color = "green";
-    else if (ratio === 1) color = "blue";
-    // If ratio > 1, color remains red
+    widthPercentage = String(Math.min(ratio * 100, 100));
+    if (ratio > 1) withinLimit = false;
   }
 
   return (
-    <div className="block max-w-sm p-6 border rounded-lg shadow bg-gray-800 border-gray-700">
-      <div className="flex justify-between pb-6">
-        <p className="text-slate-200">{name}</p>
-        <p className="text-slate-200">
-          {expense_sum.Float64}/{total}€
-        </p>
-      </div>
+    <>
+      <div className="card w-96 bg-base-300 shadow-xl">
+        <div className="card-body">
+          <h2 className="card-title">{name}</h2>
 
-      <div className="w-full rounded-full h-2.5 bg-gray-700">
-        <div
-          className={`h-2.5 rounded-full ${
-            color === "green"
-              ? "bg-green-600"
-              : color === "blue"
-              ? "bg-blue-600"
-              : "bg-red-600"
-          }`}
-          style={{ width: `${widthPercentage}%` }}
-        />
-      </div>
-
-      <div className="flex justify-between pt-3">
-        <Link
-          to={`/category/${category_id}`}
-          className="text-slate-200 border border-solid border-slate-400 rounded
-        hover:bg-slate-700 p-2"
-        >
-          view tx
-        </Link>
-        <button
-          onClick={() => {
-            //so Link component does not get called
-            setModalOpen(true);
-          }}
-          className="text-slate-200 border border-solid border-slate-400 rounded hover:bg-slate-700 p-2"
-        >
-          Add expense
-        </button>
+          <p className="text-end">
+            {expense_sum.Float64}/{total}€
+          </p>
+          <progress
+            className={`progress w-full mt-1 mb-3 ${
+              withinLimit ? "progress-primary" : "progress-error"
+            }`}
+            value={widthPercentage}
+            max="100"
+          />
+          <div className="card-actions justify-between">
+            <Link
+              to={`/category/${category_id}`}
+              className="btn btn-outline inline-flex items-center"
+            >
+              <i className="material-icons">history</i>
+            </Link>
+            <button
+              onClick={() => {
+                //so Link component does not get called
+                setModalOpen(true);
+              }}
+              className="btn btn-outline inline-flex items-center"
+            >
+              <i className="material-icons">add</i>
+            </button>
+          </div>
+        </div>
       </div>
 
       <Modal isOpen={isModalOpen}>
@@ -123,31 +116,23 @@ const ExpenseCard = ({
             setStatus(""), setValue(""), setTitle("");
           }}
         >
-          <label>
-            Title
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="border border-solid rounded "
-            />
-          </label>
+          <FormField
+            name="Title"
+            type="text"
+            state={title}
+            setState={setTitle}
+          />
 
-          <div className="pl-4">
-            <label className="inline-block">
-              Expense (required):
-              <input
-                type="number"
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                required
-                className="border border-solid rounded "
-              />
-            </label>
-          </div>
+          <FormField
+            name="Value (€)"
+            type="number"
+            required={true}
+            state={value}
+            setState={setValue}
+          />
         </AddForm>
       </Modal>
-    </div>
+    </>
   );
 };
 

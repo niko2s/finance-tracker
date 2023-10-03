@@ -35,30 +35,31 @@ const UserProfile = () => {
 
   return (
     <div>
-      <div className="flex justify-between gap-4 m-2">
+      <div className="flex flex-col items-end gap-4 m-2">
         <p>Logged in as {user?.username}</p>
 
-        <div className="flex gap-5">
-          <p>Balance: {user?.balance}</p>
-          <Link to="/add/balance" className="border solid">
-            Add balance
+        <div className="flex">
+          <p>{user?.balance} €</p>
+          <Link to="/add/balance" className="btn btn-xs btn-outline items-center rounded ml-2">
+            <i className="material-icons">add</i>
           </Link>
         </div>
       </div>
 
-      <div className="my-3">
+      <div className="my-3 flex justify-center">
         <Link
           to="/add/category"
-          className="border solid border-black p-2 rounded"
+          className="btn inline-flex items-center border solid border-primary p-2 rounded"
         >
-          Add a new expense category
+          <i className="material-icons">add</i>
+          <span>Category</span>
         </Link>
       </div>
 
       <ul className="flex flex-wrap items-center justify-center">
         {expenseOverviews?.map((ec: ExpenseOverview) => {
           return (
-            <li key={ec.category_id} className="w-96 h-48 mx-2">
+            <li key={ec.category_id} className="w-96 h-48 mx-2 my-5">
               <ExpenseCard
                 category_id={ec.category_id}
                 name={ec.name}

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import AddForm from "../../components/AddForm";
 import { useUser } from "../../components/context/UserContext";
+import FormField from "../../components/FormField";
 
 const AddBalance = () => {
   const [title, setTitle] = useState("");
@@ -19,30 +20,16 @@ const AddBalance = () => {
 
   return (
     <div className="mt-6">
-      <AddForm title="test" handleSubmit={handleSubmit} status="">
-        <label>
-          Title:
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="border border-solid rounded "
-          />
-        </label>
-
-        <div className="pl-4">
-          <label className="inline-block">
-            Value (required):
-            <input
-              type="number"
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              required
-              className="border border-solid rounded "
-            />
-          </label>
-          <label>Current balance: {user?.balance}€</label>
-        </div>
+      <AddForm title="Add balance" handleSubmit={handleSubmit} status="">
+        <FormField name="Title" type="text" state={title} setState={setTitle} />
+        <FormField
+          name="Value"
+          info={`Current balance: ${user?.balance}€`}
+          type="number"
+          required={true}
+          state={value}
+          setState={setValue}
+        />
       </AddForm>
     </div>
   );

@@ -31,19 +31,28 @@ const ExpenseCategory = () => {
 
   return (
     <>
-      {!expenses && <p>No expenses yet!</p>}
+      {!expenses && (
+        <p className="text-lg font-semibold text-center mt-8">
+          No expenses yet!
+        </p>
+      )}
       {!!expenses && (
-        <ul>
-          {expenses.map((e: Expense) => {
-            return (
-              <li key={e.id}>
-                <p>
-                  Title: {e.title} Value: {e.value}
-                </p>
-              </li>
-            );
-          })}
-        </ul>
+        <div className="max-w-md mx-auto">
+          <div className="flex justify-between py-2 border-b border-base-content text-lg font-semibold mt-8">
+            <span>Title</span>
+            <span>Value</span>
+          </div>
+          <ul className="divide-y divide-base-content">
+            {expenses.map((e: Expense) => {
+              return (
+                <li key={e.id} className="flex justify-between py-4">
+                  <span className="text-lg">{e.title}</span>
+                  <span className="text-lg">{e.value}</span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       )}
     </>
   );
