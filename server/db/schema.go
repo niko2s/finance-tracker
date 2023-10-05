@@ -10,7 +10,7 @@ func CreateSchema(db *sql.DB) error {
 		 id SERIAL PRIMARY KEY,
 		 username VARCHAR(50) NOT NULL,
 		 email VARCHAR(100) NOT NULL,
-		 password VARCHAR(20) NOT NULL,
+		 password VARCHAR(60) NOT NULL,
 		 balance INTEGER DEFAULT 0
 	 );`
 

@@ -5,15 +5,19 @@ import (
 	"finance-tracker-server/helpers"
 	"finance-tracker-server/models"
 	"finance-tracker-server/repository"
+	"golang.org/x/crypto/bcrypt"
 	"log"
 )
 
 func LogIn(ur *repository.UserRepository, rtr *repository.RefreshTokenRepository, email string, password string) (string, string, int, error) {
-	user, err := ur.GetUserByEmailAndPassword(email, password)
+	user, err := ur.GetUserByEmail(email)
 	if err != nil {
-		//wrong email/password
-		log.Printf("Error getting user by email and password: %v", err)
 		return "", "", 0, errors.New("invalid email or password")
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if err != nil {
+		return "", "", 0, errors.New("invalid password or password")
 	}
 
 	authTokenStr, err := helpers.CreateAuthToken(user.ID)
@@ -47,11 +51,20 @@ func LogIn(ur *repository.UserRepository, rtr *repository.RefreshTokenRepository
 }
 
 func AddUser(ur *repository.UserRepository, newUser models.User) error {
-	err := ur.AddUser(newUser)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newUser.Password), bcrypt.DefaultCost)
 	if err != nil {
-		log.Fatal(err)
+		log.Println("Error hashing password: ", err)
+		return err
 	}
-	return err
+
+	newUser.Password = string(hashedPassword)
+
+	err = ur.AddUser(newUser)
+	if err != nil {
+		log.Println("Error adding new user: ", err)
+		return err
+	}
+	return nil
 }
 
 func GetUserById(ur *repository.UserRepository, userId int) (models.User, error) {

@@ -13,9 +13,9 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 	return &UserRepository{db}
 }
 
-func (ur *UserRepository) GetUserByEmailAndPassword(email string, password string) (models.User, error) {
+func (ur *UserRepository) GetUserByEmail(email string) (models.User, error) {
 	var user models.User
-	err := ur.db.QueryRow(`SELECT * FROM users WHERE email=$1 AND password=$2`, email, password).Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Balance)
+	err := ur.db.QueryRow(`SELECT * FROM users WHERE email=$1`, email).Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Balance)
 
 	return user, err
 }
