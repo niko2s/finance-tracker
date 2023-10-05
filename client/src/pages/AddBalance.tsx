@@ -1,7 +1,7 @@
 import { useState } from "react";
-import AddForm from "../../components/AddForm";
-import { useUser } from "../../components/context/UserContext";
-import FormField from "../../components/FormField";
+import AddForm from "../components/AddForm";
+import { useUser } from "../context/UserContext";
+import FormField from "../components/FormField";
 
 const AddBalance = () => {
   const [title, setTitle] = useState("");

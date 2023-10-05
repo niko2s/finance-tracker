@@ -47,6 +47,21 @@ func CreateSchema(db *sql.DB) error {
 		return err
 	}
 
+	createRefreshTokensTableSQL := `CREATE TABLE IF NOT EXISTS refresh_tokens (
+		id SERIAL PRIMARY KEY,
+		user_id INT NOT NULL,
+		token_value VARCHAR(255) NOT NULL,
+		expires_at TIMESTAMP NOT NULL,
+		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+		revoked BOOLEAN DEFAULT FALSE NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+	);`
+
+	_, err = db.Exec(createRefreshTokensTableSQL)
+	if err != nil {
+		return err
+	}
+
 	createExpensesViewSQL := `
     CREATE OR REPLACE VIEW ExpenseOverview AS
     SELECT

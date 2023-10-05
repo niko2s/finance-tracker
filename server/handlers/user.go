@@ -8,28 +8,41 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+	"time"
 )
 
-func LogIn(c *gin.Context, ur *repository.UserRepository) {
+func LogIn(c *gin.Context, ur *repository.UserRepository, rtr *repository.RefreshTokenRepository) {
 	var login models.Login
 
 	if err := c.ShouldBindJSON(&login); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad request, email and password required"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "email and password required"})
 		return
 	}
 
-	token, id, err := services.LogIn(ur, login.Email, login.Password)
+	authToken, refreshToken, id, err := services.LogIn(ur, rtr, login.Email, login.Password)
 
 	if err != nil {
 		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		return
 	}
 
+	authTime, refreshTime := helpers.GetAuthAndRefreshTime()
+
 	http.SetCookie(c.Writer, &http.Cookie{
 		Name:     "Authorization",
-		Value:    token,
+		Value:    authToken,
 		Path:     "/",
-		Secure:   false,
+		MaxAge:   int(authTime / time.Second),
+		Secure:   false, //should be True when deployed
+		HttpOnly: true,
+	})
+
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "Refresh",
+		Value:    refreshToken,
+		Path:     "/", //cookie only added in requests to this path
+		MaxAge:   int(refreshTime / time.Second),
+		Secure:   false, //should be True when deployed
 		HttpOnly: true,
 	})
 

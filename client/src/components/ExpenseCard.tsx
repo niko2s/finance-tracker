@@ -4,6 +4,8 @@ import { ExpenseCardProps } from "../types";
 import AddForm from "./AddForm";
 import { Link } from "react-router-dom";
 import FormField from "./FormField";
+import useCustomFetch from "../hooks/customFetch";
+import apiPaths from "../api/paths";
 
 const ExpenseCard = ({
   category_id,
@@ -15,6 +17,7 @@ const ExpenseCard = ({
   const [title, setTitle] = useState("");
   const [value, setValue] = useState("");
   const [status, setStatus] = useState("");
+  const customFetch = useCustomFetch();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -27,8 +30,7 @@ const ExpenseCard = ({
   };
 
   const addExpense = async () => {
-    const api = "http://localhost:8080";
-
+  
     const addExpenseBody = {
       title,
       value: Number(value),
@@ -38,7 +40,7 @@ const ExpenseCard = ({
     const jsonAddExpenseBody = JSON.stringify(addExpenseBody);
 
     try {
-      const response = await fetch(api + "/expense", {
+      const response = await customFetch(apiPaths.expensesByCategory(category_id), {
         method: "POST",
         credentials: "include",
         headers: {
@@ -88,7 +90,7 @@ const ExpenseCard = ({
           />
           <div className="card-actions justify-between">
             <Link
-              to={`/category/${category_id}`}
+              to={`/expense-category/${category_id}`}
               className="btn btn-outline inline-flex items-center"
             >
               <i className="material-icons">history</i>

@@ -1,5 +1,6 @@
 import { createContext, useState, FC, useContext, useEffect } from "react";
-import { User, UserContextProps, UserProviderProps } from "../../types";
+import { User, UserContextProps, UserProviderProps } from "../types";
+import apiPaths from "../api/paths";
 
 export const UserContext = createContext<UserContextProps | undefined>(
   undefined
@@ -13,7 +14,7 @@ export const UserProvider: FC<UserProviderProps> = ({ children }) => {
     //verify user's authentication status (e.g. on reload)
     const verifyUser = async () => {
       try {
-        const response = await fetch("http://localhost:8080/user", {
+        const response = await fetch(apiPaths.currentUser, {
           method: "GET",
           credentials: "include", // Include cookies
         });

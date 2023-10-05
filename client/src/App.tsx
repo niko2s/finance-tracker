@@ -1,31 +1,31 @@
-import { Link, Route, Routes } from "react-router-dom";
+import { Link, Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Login from "./pages/Login";
 import UserProfile from "./pages/UserProfile";
-import AddExpenseCategory from "./pages/Add/AddExpenseCategory";
-import AddBalance from "./pages/Add/AddBalance";
+import AddExpenseCategory from "./pages/AddExpenseCategory";
+import AddBalance from "./pages/AddBalance";
 import ExpenseCategory from "./pages/ExpenseCategory";
-
+import ProtectedRoute from "./components/ProtectedRoute";
 function App() {
-  //use effect here to fetch user with cookie if cookie exists !?
-  //also add refresh token
-  //no ID then, because cookie is HTTP-only, cant access through JS
-
   return (
     <>
       <div className="flex justify-center mt-6">
-        <Link to="/home" className="text-5xl text-secondary">
+        <Link to="/dashboard" className="text-5xl text-secondary">
           Finance Tracker
         </Link>
       </div>
       <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/home" element={<UserProfile />} />
-        <Route path="/add">
-          <Route path="balance" element={<AddBalance />} />
-          <Route path="category" element={<AddExpenseCategory />} />
+        <Route path="/login" element={<Login />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/" element={<Navigate to="/dashboard" />} />
+          <Route path="/dashboard" element={<UserProfile />} />
+          <Route path="/add-balance" element={<AddBalance />} />
+          <Route
+            path="/add-expense-category"
+            element={<AddExpenseCategory />}
+          />
+          <Route path="/expense-category/:id" element={<ExpenseCategory />} />
         </Route>
-        <Route path="/category/:id" element={<ExpenseCategory />} />
       </Routes>
     </>
   );

@@ -17,10 +17,10 @@ export interface ExpenseOverview {
 }
 
 export interface Expense {
-  id: number,
-  title?: string | null,
-  value: number,
-  category: number
+  id: number;
+  title?: string | null;
+  value: number;
+  category: number;
 }
 
 export interface LoginResponse {
@@ -36,6 +36,11 @@ export interface UserContextProps {
 export interface UserProviderProps {
   children: ReactNode;
 }
+
+export type CustomFetchFunction = (
+  url: string,
+  options: RequestInit
+) => Promise<Response>;
 
 export interface AddFormProps {
   title: string;

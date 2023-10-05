@@ -1,15 +1,22 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Expense } from "../types";
+import useCustomFetch from "../hooks/customFetch";
+import apiPaths from "../api/paths";
 
 const ExpenseCategory = () => {
   const { id } = useParams();
+  const customFetch = useCustomFetch();
   const [expenses, setExpenses] = useState<Expense[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`http://localhost:8080/category/${id}`, {
+        if (!id) {
+          throw new Error("ID parameter is missing"); //should not happen
+        }
+
+        const response = await customFetch(apiPaths.expensesByCategory(id), {
           method: "GET",
           credentials: "include",
         });
@@ -19,7 +26,7 @@ const ExpenseCategory = () => {
         }
 
         const data = (await response.json()) as Expense[];
-        console.log(data);
+
         setExpenses(data);
       } catch (error) {
         console.error("Failed to fetch data", error);

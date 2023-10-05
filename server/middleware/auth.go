@@ -1,12 +1,10 @@
 package middleware
 
 import (
-	"finance-tracker-server/services"
+	"finance-tracker-server/helpers"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
 	"net/http"
-	"os"
 )
 
 func invalidAbort(c *gin.Context, err error) {
@@ -24,38 +22,14 @@ func AuthRequired() gin.HandlerFunc {
 			return
 		}
 
-		token, err := jwt.Parse(authCookie.Value, func(token *jwt.Token) (interface{}, error) {
-			// Don't forget to validate the alg is what you expect:
-			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-			}
+		userId, err := helpers.ValidateToken(authCookie.Value, true)
 
-			return []byte(os.Getenv("JWT_SECRET")), nil
-		})
-
-		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			id := claims["user"].(float64)
-			c.Set("userId", id)
-
-			// refresh auth token in cookies every successful request
-			newTokenString, err := services.CreateToken(int(id))
-			if err != nil {
-				fmt.Println(err) //log error here, but request still 200
-			} else {
-				http.SetCookie(c.Writer, &http.Cookie{
-					Name:     "Authorization",
-					Value:    newTokenString,
-					Path:     "/",
-					MaxAge:   600, //10min, change to one var here and in services.CreateToken
-					Secure:   false,
-					HttpOnly: true,
-				})
-			}
-
-			c.Next()
-		} else {
+		if err != nil {
 			invalidAbort(c, err)
+			return
 		}
 
+		c.Set("userId", userId)
+		c.Next()
 	}
 }

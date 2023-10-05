@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
 import ExpenseCard from "../components/ExpenseCard";
-import { useUser } from "../components/context/UserContext";
+import { useUser } from "../context/UserContext";
 import { Link } from "react-router-dom";
 import { ExpenseOverview } from "../types";
+import useCustomFetch from "../hooks/customFetch";
+import apiPaths from "../api/paths";
 
 const UserProfile = () => {
   const { user } = useUser();
+
+  const customFetch = useCustomFetch();
   const [expenseOverviews, setExpenseOverviews] = useState<ExpenseOverview[]>(
     []
   );
@@ -13,7 +17,7 @@ const UserProfile = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:8080/categories", {
+        const response = await customFetch(apiPaths.categories, {
           method: "GET",
           credentials: "include",
         });
@@ -23,7 +27,6 @@ const UserProfile = () => {
         }
 
         const data = (await response.json()) as ExpenseOverview[];
-        console.log(data);
         setExpenseOverviews(data);
       } catch (error) {
         console.error("Failed to fetch data", error);
@@ -40,7 +43,7 @@ const UserProfile = () => {
 
         <div className="flex">
           <p>{user?.balance} €</p>
-          <Link to="/add/balance" className="btn btn-xs btn-outline items-center rounded ml-2">
+          <Link to="/add-balance" className="btn btn-xs btn-outline items-center rounded ml-2">
             <i className="material-icons">add</i>
           </Link>
         </div>
@@ -48,7 +51,7 @@ const UserProfile = () => {
 
       <div className="my-3 flex justify-center">
         <Link
-          to="/add/category"
+          to="/add-expense-category"
           className="btn inline-flex items-center border solid border-primary p-2 rounded"
         >
           <i className="material-icons">add</i>

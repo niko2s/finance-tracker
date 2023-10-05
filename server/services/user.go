@@ -2,41 +2,48 @@ package services
 
 import (
 	"errors"
+	"finance-tracker-server/helpers"
 	"finance-tracker-server/models"
 	"finance-tracker-server/repository"
 	"log"
-	"os"
-	"time"
-
-	"github.com/golang-jwt/jwt/v5"
 )
 
-func LogIn(ur *repository.UserRepository, email string, password string) (string, int, error) {
+func LogIn(ur *repository.UserRepository, rtr *repository.RefreshTokenRepository, email string, password string) (string, string, int, error) {
 	user, err := ur.GetUserByEmailAndPassword(email, password)
 	if err != nil {
 		//wrong email/password
 		log.Printf("Error getting user by email and password: %v", err)
-		return "", 0, errors.New("invalid email or password")
+		return "", "", 0, errors.New("invalid email or password")
 	}
 
-	token, err := CreateToken(user.ID) // error handled in func, just forward to handler
-	return token, user.ID, err
-}
-
-func CreateToken(id int) (string, error) {
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user": id,
-		"exp":  jwt.NewNumericDate(time.Now().Add(10 * time.Minute)),
-	})
-
-	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+	authTokenStr, err := helpers.CreateAuthToken(user.ID)
 
 	if err != nil {
-		log.Printf("Error creating JWT signed token: %v", err)
-		return "", errors.New("internal error during login")
+		log.Printf("Error creating auth token: %v", err)
+		return "", "", 0, errors.New("internal error during login")
 	}
-	return tokenString, nil
+	refreshTokenStr, refreshExp, err := helpers.CreateRefreshToken(user.ID)
+
+	if err != nil {
+		log.Printf("Error creating refresh token: %v", err)
+		return "", "", 0, errors.New("internal error during login")
+	}
+
+	//save refreshToken on successful creation in DB
+
+	refreshExpFormatted := helpers.FormatTimeTimeToPostgres(refreshExp)
+	refreshToken := models.RefreshToken{
+		UserId:     user.ID,
+		TokenValue: refreshTokenStr,
+		ExpiresAt:  refreshExpFormatted,
+	}
+	err = rtr.AddNewRefreshToken(refreshToken)
+	if err != nil {
+		log.Printf("Error saving refresh token: %v", err)
+		return "", "", 0, errors.New("internal error during login")
+	}
+
+	return authTokenStr, refreshTokenStr, user.ID, err
 }
 
 func AddUser(ur *repository.UserRepository, newUser models.User) error {

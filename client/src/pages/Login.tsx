@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { User } from "../types";
-import { useUser } from "../components/context/UserContext";
+import { useUser } from "../context/UserContext";
 import { useNavigate } from "react-router-dom";
 import FormField from "../components/FormField";
+import useCustomFetch from "../hooks/customFetch";
+import apiPaths from "../api/paths";
 
 //maybe refactor into two components
 function Login() {
@@ -12,17 +14,27 @@ function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const customFetch = useCustomFetch();
 
   //useState to display (error-) message
   //interface for ^ message, e.g. msg, color, ...
 
-  const { setUser } = useUser();
+  const { user, setUser } = useUser();
 
-  const api = "http://localhost:8080";
+  //if user logged in, move to dashboard
+  useEffect(() => {
+    if (!user) {
+      getUser();
+    }
+    if (user) {
+      navigate("/dashboard");
+    }
+  }, [user]);
+
 
   const getUser = async () => {
     try {
-      const response = await fetch(api + `/user`, {
+      const response = await customFetch(apiPaths.currentUser, {
         method: "GET",
         credentials: "include",
       });
@@ -35,7 +47,7 @@ function Login() {
       const userData = (await response.json()) as User;
 
       setUser(userData);
-      navigate("/home");
+      navigate("/dashboard");
     } catch (error) {
       console.error("Fetch error:", error);
     }
@@ -49,7 +61,7 @@ function Login() {
     const jsonLoginData = JSON.stringify(loginData);
 
     try {
-      const response = await fetch(api + "/login", {
+      const response = await fetch(apiPaths.login, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -81,7 +93,7 @@ function Login() {
     const jsonRegisterBody = JSON.stringify(registerBody);
 
     try {
-      const response = await fetch(api + "/addUser", {
+      const response = await fetch(apiPaths.register, {
         method: "POST",
         credentials: "include",
         headers: {

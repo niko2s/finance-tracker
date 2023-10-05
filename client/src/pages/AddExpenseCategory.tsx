@@ -1,17 +1,21 @@
 import { useState } from "react";
-import AddForm from "../../components/AddForm";
-import { useUser } from "../../components/context/UserContext";
-import FormField from "../../components/FormField";
+import AddForm from "../components/AddForm";
+import { useUser } from "../context/UserContext";
+import FormField from "../components/FormField";
+import useCustomFetch from "../hooks/customFetch";
+import apiPaths from "../api/paths";
 
 const AddExpenseCategory = () => {
   const [title, setTitle] = useState("");
   const [value, setValue] = useState("");
   const [status, setStatus] = useState("");
+  const customFetch = useCustomFetch();
+
 
   const { user } = useUser();
 
   const postCategory = async () => {
-    const api = "http://localhost:8080";
+
     const registerBody = {
       name: title,
       total: parseFloat(value),
@@ -20,7 +24,7 @@ const AddExpenseCategory = () => {
     const jsonCategoryBody = JSON.stringify(registerBody);
 
     try {
-      const response = await fetch(api + "/addCategory", {
+      const response = await customFetch(apiPaths.categories, {
         method: "POST",
         credentials: "include",
         headers: {
