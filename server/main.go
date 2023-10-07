@@ -57,6 +57,12 @@ func main() {
 		auth := v1.Group("/")
 		auth.Use(middleware.AuthRequired())
 		{
+
+			//logout
+			v1.POST("/logout", func(c *gin.Context) {
+				handlers.LogOut(c, refreshTokenRepo)
+			})
+
 			//user
 			auth.GET("/users/me", func(c *gin.Context) {
 				handlers.GetUser(c, userRepo)

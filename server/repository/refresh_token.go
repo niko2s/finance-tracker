@@ -34,3 +34,8 @@ func (rtr *RefreshTokenRepository) GetRefreshToken(tokenValue string) (*models.R
 	}
 	return &refreshToken, nil
 }
+
+func (rtr *RefreshTokenRepository) SetRefreshTokenInvalid(tokenValue string) error {
+	_, err := rtr.db.Exec(`UPDATE refresh_tokens SET revoked = true WHERE token_value = $1`, tokenValue)
+	return err
+}

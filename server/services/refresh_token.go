@@ -17,7 +17,7 @@ func CreateNewAuthFromRefreshToken(rtr *repository.RefreshTokenRepository, refre
 	refreshTokenTime, err := helpers.FormatTimePostgresToTimeTime(refreshToken.ExpiresAt)
 
 	//check if expired, because expired refresh tokens not instantly deleted
-	if err != nil || refreshTokenTime.Before(time.Now()) {
+	if err != nil || refreshToken.Revoked || refreshTokenTime.Before(time.Now()) {
 		return "", errors.New("invalid refresh token")
 	}
 
@@ -30,4 +30,13 @@ func CreateNewAuthFromRefreshToken(rtr *repository.RefreshTokenRepository, refre
 
 	return authToken, nil
 
+}
+
+func InvalidateRefreshToken(rtr *repository.RefreshTokenRepository, refreshTokenString string) error {
+	err := rtr.SetRefreshTokenInvalid(refreshTokenString)
+	if err != nil {
+		log.Printf("Error logging out user: %v", err)
+		return errors.New("internal error at logout")
+	}
+	return nil
 }
