@@ -2,7 +2,6 @@ package db
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"os"
 
@@ -29,7 +28,7 @@ func ConnectToDb() *sql.DB {
 			log.Fatal(err)
 		}
 	}
-	fmt.Printf("version=%s\n", version)
+	log.Printf("version=%s\n", version)
 
 	return db
 }

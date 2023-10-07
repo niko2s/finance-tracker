@@ -1,16 +1,24 @@
 package middleware
 
 import (
+	"errors"
 	"finance-tracker-server/helpers"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 func invalidAbort(c *gin.Context, err error) {
-	c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid authorization token"})
+
+	var httpStatus int
+
+	if errors.Is(err, helpers.ErrUnauthorized) {
+		httpStatus = http.StatusUnauthorized
+	} else {
+		httpStatus = http.StatusForbidden
+	}
+
+	c.JSON(httpStatus, gin.H{"error": "Invalid authorization token"})
 	c.Abort()
-	fmt.Println(err)
 }
 
 func AuthRequired() gin.HandlerFunc {
@@ -18,14 +26,14 @@ func AuthRequired() gin.HandlerFunc {
 
 		authCookie, err := c.Request.Cookie("Authorization")
 		if err != nil {
-			invalidAbort(c, err)
+			invalidAbort(c, helpers.ErrUnauthorized)
 			return
 		}
 
 		userId, err := helpers.ValidateToken(authCookie.Value, true)
 
 		if err != nil {
-			invalidAbort(c, err)
+			invalidAbort(c, helpers.ErrForbidden)
 			return
 		}
 

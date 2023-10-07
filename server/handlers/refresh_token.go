@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"finance-tracker-server/helpers"
 	"finance-tracker-server/repository"
 	"finance-tracker-server/services"
@@ -13,13 +14,17 @@ func RefreshToken(c *gin.Context, rtr *repository.RefreshTokenRepository) {
 	cookie, err := c.Cookie("Refresh")
 
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "no refresh cookie in request"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "no refresh cookie in request"})
 		return
 	}
 	authToken, err := services.CreateNewAuthFromRefreshToken(rtr, cookie)
 
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		if errors.Is(err, helpers.ErrUnauthorized) {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
 		return
 	}
 

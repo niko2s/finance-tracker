@@ -1,12 +1,12 @@
 package handlers
 
 import (
+	"errors"
 	"finance-tracker-server/helpers"
 	"finance-tracker-server/models"
 	"finance-tracker-server/repository"
 	"finance-tracker-server/services"
 	"github.com/gin-gonic/gin"
-	"log"
 	"net/http"
 	"time"
 )
@@ -22,7 +22,11 @@ func LogIn(c *gin.Context, ur *repository.UserRepository, rtr *repository.Refres
 	authToken, refreshToken, id, err := services.LogIn(ur, rtr, login.Email, login.Password)
 
 	if err != nil {
-		c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+		if errors.Is(err, helpers.ErrUnauthorized) {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
 		return
 	}
 
@@ -53,7 +57,8 @@ func AddUser(c *gin.Context, ur *repository.UserRepository) {
 	var newUser models.User
 
 	if err := c.ShouldBindJSON(&newUser); err != nil {
-		log.Fatal(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "email and password required"})
+		return
 	}
 
 	//check if username&email unique
@@ -62,7 +67,7 @@ func AddUser(c *gin.Context, ur *repository.UserRepository) {
 	err := services.AddUser(ur, newUser)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert user"})
-		log.Fatal(err)
+		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "User added!"})
 }
@@ -76,14 +81,4 @@ func GetUser(c *gin.Context, ur *repository.UserRepository) {
 	}
 
 	c.JSON(http.StatusOK, user)
-}
-
-func GetUsers(c *gin.Context, ur *repository.UserRepository) {
-	users, err := services.GetUsers(ur)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch users"})
-		return
-	}
-
-	c.JSON(http.StatusOK, users)
 }

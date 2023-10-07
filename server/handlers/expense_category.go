@@ -14,7 +14,9 @@ func AddExpenseCategory(c *gin.Context, ecr *repository.ExpenseCategoryRepositor
 	var newExpenseCategory models.ExpenseCategory
 
 	if err := c.ShouldBindJSON(&newExpenseCategory); err != nil {
-		log.Fatal(err)
+		log.Printf("Error at bind: %v", err)
+		c.Status(http.StatusBadRequest)
+		return
 	}
 
 	userId := helpers.GetUserIdFromContext(c)
@@ -26,10 +28,10 @@ func AddExpenseCategory(c *gin.Context, ecr *repository.ExpenseCategoryRepositor
 
 	err := services.AddExpenseCategory(ecr, newExpenseCategory)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert user"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert category"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "User added!"})
+	c.JSON(http.StatusOK, gin.H{"message": "Category added!"})
 }
 
 func GetExpenseCategories(c *gin.Context, eor *repository.ExpenseOverviewRepository) {
@@ -43,13 +45,3 @@ func GetExpenseCategories(c *gin.Context, eor *repository.ExpenseOverviewReposit
 
 	c.JSON(http.StatusOK, categories)
 }
-
-//func GetUsers(c *gin.Context, ur *repository.UserRepository) {
-//	users, err := services.GetUsers(ur)
-//	if err != nil {
-//		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch users"})
-//		return
-//	}
-//
-//	c.JSON(http.StatusOK, users)
-//}

@@ -9,6 +9,10 @@ type ExpenseOverviewRepository struct {
 	db *sql.DB
 }
 
+func NewExpenseOverviewRepository(db *sql.DB) *ExpenseOverviewRepository {
+	return &ExpenseOverviewRepository{db}
+}
+
 func (eor *ExpenseOverviewRepository) GetAllExpenseCategoriesByUserId(userId int) ([]models.ExpenseOverview, error) {
 	rows, err := eor.db.Query(`SELECT user_id, category_id, category_name, category_total, sum_expenses FROM ExpenseOverview WHERE user_id=$1`, userId)
 	if err != nil {
@@ -36,6 +40,15 @@ func (eor *ExpenseOverviewRepository) GetAllExpenseCategoriesByUserId(userId int
 	return expenseOverviews, nil
 }
 
-func NewExpenseOverviewRepository(db *sql.DB) *ExpenseOverviewRepository {
-	return &ExpenseOverviewRepository{db}
+func (eor *ExpenseOverviewRepository) GetUserIdByCategoryId(categoryId int) (int, error) {
+	row := eor.db.QueryRow(`SELECT user_id FROM expense_categories WHERE id=$1`, categoryId)
+
+	var userId int
+
+	err := row.Scan(&userId)
+	if err != nil {
+		return -1, nil
+	}
+
+	return userId, nil
 }
