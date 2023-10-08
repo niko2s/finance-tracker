@@ -1,0 +1,32 @@
+version: '3'
+services:
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+  
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    restart: on-failure
+    environment:
+      DEV_DB: postgres://user:password@db:5432/mydatabase?sslmode=disable
+      AUTH_JWT_SECRET: asdfsdfasdfasdfasdfasdfasdfasdf #only for test purposes
+      REFRESH_JWT_SECRET: qwerqwerqwerqwerqwerqwerqwerq #only for test purposes
+
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydatabase
+    ports:
+      - "5432:5432"
