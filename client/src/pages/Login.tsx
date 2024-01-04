@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { User } from "../types";
+import { User, InfoMessage } from "../types";
 import { useUser } from "../context/UserContext";
 import { useNavigate } from "react-router-dom";
 import FormField from "../components/FormField";
-import useCustomFetch from "../hooks/customFetch";
 import apiPaths from "../api/paths";
+import useCustomFetch from "../hooks/customFetch";
 
 //maybe refactor into two components
 function Login() {
@@ -12,7 +12,7 @@ function Login() {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [message, setMessage] = useState<InfoMessage>({ message: "", color: "default" });
   const navigate = useNavigate();
   const customFetch = useCustomFetch();
 
@@ -37,6 +37,7 @@ function Login() {
     const jsonLoginData = JSON.stringify(loginData);
 
     try {
+      //post login data, on successful login set cookies
       const responseLogin = await fetch(apiPaths.login, {
         method: "POST",
         credentials: "include",
@@ -46,28 +47,29 @@ function Login() {
         body: jsonLoginData,
       });
 
-      if (!responseLogin.ok) {
-        //add proper error handling
-        throw new Error("Network response not 200");
+      if (responseLogin.status === 401) {
+        setMessage({ message: "Wrong Username or Password!", color: "red" })
+        console.log("Wrong Username or Password!");
       }
 
-      const userData = await responseLogin.json();
-      console.log("First userdata: " + userData);
+      if (responseLogin.ok) {
+        //get user data
+        const responseUser = await customFetch(apiPaths.currentUser, {
+          method: "GET",
+          credentials: "include",
+        });
 
-      const responseUser = await fetch(apiPaths.currentUser, {
-        method: "GET",
-        credentials: "include",
-      });
-
-      if (responseUser.ok) {
-        const data = (await responseUser.json()) as User;
-        setUser(data);
+        if (responseUser.ok) {
+          const data = (await responseUser.json()) as User;
+          setUser(data);
+        }
       }
 
     } catch (error) {
+      setMessage({ message: "Internal error occured!", color: "red" })
       console.error("Fetch error:", error);
     }
-    
+
   };
 
   const register = async () => {
@@ -91,9 +93,6 @@ function Login() {
       if (!response.ok) {
         throw new Error("Network response not 200");
       }
-
-      const userData = await response.json();
-      console.log("response:" + userData);
     } catch (error) {
       console.error("Fetch error:", error);
     }
@@ -104,16 +103,22 @@ function Login() {
 
     if (isLogin) {
       if (!username || !password) {
-        setError("Username and Password are required");
+        setMessage({ message: "Username and Password are required", color: "red" });
         return;
       }
       login();
     } else {
       if (!username || !password || !email) {
-        setError("Username, Email and Password are required");
+        setMessage({ message: "Username, Email and Password are required", color: "red" });
         return;
       }
       register();
+
+      setMessage({ message: "Successfully registered new user!", color: "default" });
+      setUsername("");
+      setEmail("");
+      setPassword("");
+      setIsLogin(true);
     }
   };
 
@@ -148,7 +153,7 @@ function Login() {
             setState={setPassword}
           />
 
-          {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
+          {message && <div className={`text-sm text-center mt-2 ${message.color === 'red' ? 'text-red-500' : 'text-secondary'}`}>{message.message}</div>}
 
           <div>
             <button type="submit" className="btn btn-primary w-full">
@@ -159,7 +164,10 @@ function Login() {
 
         <button
           className="text-primary mt-4"
-          onClick={() => setIsLogin((isLogin) => !isLogin)}
+          onClick={() => {
+            setIsLogin((isLogin) => !isLogin);
+            setMessage({ message: "", color: "default" });
+          }}
         >
           {isLogin
             ? "Need an account? Register"

@@ -8,6 +8,11 @@ export interface User {
   balance: number;
 }
 
+export interface InfoMessage {
+  message: string;
+  color: "red" | "default";
+}
+
 export interface ExpenseOverview {
   user_id: number;
   category_id: number;
