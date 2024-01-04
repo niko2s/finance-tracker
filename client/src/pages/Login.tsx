@@ -23,35 +23,11 @@ function Login() {
 
   //if user logged in, move to dashboard
   useEffect(() => {
-    if (!user) {
-      getUser();
-    }
     if (user) {
       navigate("/dashboard");
     }
   }, [user]);
 
-
-  const getUser = async () => {
-    try {
-      const response = await customFetch(apiPaths.currentUser, {
-        method: "GET",
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        //add proper error handling
-        throw new Error("Network response not 200");
-      }
-
-      const userData = (await response.json()) as User;
-
-      setUser(userData);
-      navigate("/dashboard");
-    } catch (error) {
-      console.error("Fetch error:", error);
-    }
-  };
 
   const login = async () => {
     const loginData = {
@@ -61,7 +37,7 @@ function Login() {
     const jsonLoginData = JSON.stringify(loginData);
 
     try {
-      const response = await fetch(apiPaths.login, {
+      const responseLogin = await fetch(apiPaths.login, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -70,18 +46,28 @@ function Login() {
         body: jsonLoginData,
       });
 
-      if (!response.ok) {
+      if (!responseLogin.ok) {
         //add proper error handling
         throw new Error("Network response not 200");
       }
 
-      //const userData = await response.json();
-      //console.log("First userdata: " + userData);
+      const userData = await responseLogin.json();
+      console.log("First userdata: " + userData);
 
-      await getUser();
+      const responseUser = await fetch(apiPaths.currentUser, {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (responseUser.ok) {
+        const data = (await responseUser.json()) as User;
+        setUser(data);
+      }
+
     } catch (error) {
       console.error("Fetch error:", error);
     }
+    
   };
 
   const register = async () => {

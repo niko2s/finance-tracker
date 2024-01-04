@@ -19,12 +19,21 @@ export const UserProvider: FC<UserProviderProps> = ({ children }) => {
           credentials: "include", // Include cookies
         });
 
+        if (response.status === 401) {
+          console.log("User not authenticated")
+        }
+
+        if (response.status === 403) {
+          console.log("Invalid token")
+        }
+
         if (response.ok) {
           const data = (await response.json()) as User;
           setUser(data);
         }
+
       } catch (error) {
-        console.error("Failed to verify user", error);
+        console.error("Failed to verify user", error); // network error
       } finally {
         setLoading(false);
       }
