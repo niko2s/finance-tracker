@@ -13,7 +13,6 @@ const ExpenseCard = ({
   total,
   expense_sum,
 }: ExpenseCardProps) => {
-  const [isModalOpen, setModalOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [value, setValue] = useState("");
   const [status, setStatus] = useState("");
@@ -30,7 +29,7 @@ const ExpenseCard = ({
   };
 
   const addExpense = async () => {
-  
+
     const addExpenseBody = {
       title,
       value: Number(value),
@@ -82,9 +81,8 @@ const ExpenseCard = ({
             {expense_sum.Float64}/{total}€
           </p>
           <progress
-            className={`progress w-full mt-1 mb-3 ${
-              withinLimit ? "progress-primary" : "progress-error"
-            }`}
+            className={`progress w-full mt-1 mb-3 ${withinLimit ? "progress-primary" : "progress-error"
+              }`}
             value={widthPercentage}
             max="100"
           />
@@ -97,8 +95,7 @@ const ExpenseCard = ({
             </Link>
             <button
               onClick={() => {
-                //so Link component does not get called
-                setModalOpen(true);
+                (document.getElementById(`modal-${category_id}`) as HTMLDialogElement).showModal()
               }}
               className="btn btn-outline inline-flex items-center"
             >
@@ -108,15 +105,14 @@ const ExpenseCard = ({
         </div>
       </div>
 
-      <Modal isOpen={isModalOpen}>
+
+      <Modal id={`modal-${category_id}`} onClose={() => {
+        setStatus(""), setValue(""), setTitle("");
+      }}>
         <AddForm
           title={`Add an expense to ${name}`}
           handleSubmit={handleSubmit}
           status={status}
-          onClose={() => {
-            setModalOpen(false);
-            setStatus(""), setValue(""), setTitle("");
-          }}
         >
           <FormField
             name="Title"
@@ -134,6 +130,8 @@ const ExpenseCard = ({
           />
         </AddForm>
       </Modal>
+
+
     </>
   );
 };

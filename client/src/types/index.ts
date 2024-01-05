@@ -52,7 +52,6 @@ export interface AddFormProps {
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   status: string;
   children: React.ReactNode;
-  onClose?: () => void;
 }
 
 export interface ExpenseCardProps {
@@ -68,6 +67,7 @@ export interface goSqlNullFloat64 {
 }
 
 export interface ModalProps {
-  isOpen: boolean;
+  id: string;
+  onClose: () => void;
   children: React.ReactNode;
 }

@@ -1,13 +1,26 @@
 import { ModalProps } from "../types";
 
-const Modal = ({ isOpen, children }: ModalProps) => {
-  if (!isOpen) return null;
+const Modal = ({ id, onClose, children }: ModalProps) => {
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-40">
-      <div className="bg-base-100 border border-primary rounded p-8">{children}</div>
-    </div>
+    <>
+      <dialog id={id} className="modal">
+        <div className="modal-box">
+          <form method="dialog">
+            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onClick={onClose}>✕</button>
+          </form>
+          {children}
+        </div>
+        <form method="dialog" className="modal-backdrop">
+          <button onClick={onClose}>close</button>
+        </form>
+      </dialog>
+    </>
   );
+
+
+
+
 };
 
 export default Modal;
