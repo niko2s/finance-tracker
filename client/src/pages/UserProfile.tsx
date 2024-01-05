@@ -7,7 +7,7 @@ import useCustomFetch from "../hooks/customFetch";
 import apiPaths from "../api/paths";
 
 const UserProfile = () => {
-  const { user } = useUser();
+  const { user, setUser } = useUser();
   const navigate = useNavigate();
 
   const customFetch = useCustomFetch();
@@ -17,6 +17,12 @@ const UserProfile = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+
+      // When user logged out, do not fetch
+      if (!user) {
+        return;
+      }
+
       try {
         const response = await customFetch(apiPaths.categories, {
           method: "GET",
@@ -45,9 +51,12 @@ const UserProfile = () => {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        throw new Error(`${response.status}`);
       }
+
+      setUser(null);
       navigate("/login");
+      
     } catch (error) {
       console.error("Log out failed ", error);
     }
