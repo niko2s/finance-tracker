@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
 import ExpenseCard from "../components/ExpenseCard";
 import { useUser } from "../context/UserContext";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { ExpenseOverview } from "../types";
 import useCustomFetch from "../hooks/customFetch";
 import apiPaths from "../api/paths";
 
 const UserProfile = () => {
-  const { user, setUser } = useUser();
-  const navigate = useNavigate();
+  const { user } = useUser();
 
   const customFetch = useCustomFetch();
   const [expenseOverviews, setExpenseOverviews] = useState<ExpenseOverview[]>(
@@ -43,48 +42,8 @@ const UserProfile = () => {
     fetchData();
   }, []);
 
-  const handleLogout = async () => {
-    try {
-      const response = await customFetch(apiPaths.logout, {
-        method: "POST",
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        throw new Error(`${response.status}`);
-      }
-
-      setUser(null);
-      navigate("/login");
-      
-    } catch (error) {
-      console.error("Log out failed ", error);
-    }
-  };
-
   return (
     <div>
-      <div className="flex flex-col items-end m-2">
-        <div className="flex mb-6">
-          <p>Logged in as {user?.username}</p>
-          <button
-            className="btn btn-xs btn-outline items-center rounded ml-2"
-            onClick={handleLogout}
-          >
-            <i className="material-icons">logout</i>
-          </button>
-        </div>
-        <div className="flex">
-          <p>{user?.balance} €</p>
-          <Link
-            to="/add-balance"
-            className="btn btn-xs btn-outline items-center rounded ml-2 "
-          >
-            <i className="material-icons">add</i>
-          </Link>
-        </div>
-      </div>
-
       <div className="my-3 flex justify-center">
         <Link
           to="/add-expense-category"

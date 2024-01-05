@@ -9,11 +9,6 @@ import ProtectedRoute from "./components/ProtectedRoute";
 function App() {
   return (
     <>
-      <div className="flex justify-center mt-6">
-        <Link to="/dashboard" className="text-5xl text-secondary">
-          Finance Tracker
-        </Link>
-      </div>
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route element={<ProtectedRoute />}>
