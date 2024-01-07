@@ -5,7 +5,6 @@ export interface User {
   username: string;
   email: string;
   password: string;
-  balance: number;
 }
 
 export interface InfoMessage {

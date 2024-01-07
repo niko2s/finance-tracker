@@ -24,7 +24,7 @@ const AddBalance = () => {
         <FormField name="Title" type="text" state={title} setState={setTitle} />
         <FormField
           name="Value"
-          info={`Current balance: ${user?.balance}€`}
+          info={`Current balance: 0€`}
           type="number"
           required={true}
           state={value}

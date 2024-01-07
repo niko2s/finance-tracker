@@ -36,7 +36,7 @@ const NavBar = () => {
                 {!!user && (
 
                     <div className="flex items-center space-x-3  ml-12">
-                        <p className="text-xl">{user?.balance} €</p>
+                        <p className="text-xl">0 €</p>
                         <Link className="btn btn-ghost" to="/add-balance"><i className="material-icons">add</i></Link>
                     </div>
                 )}

@@ -15,14 +15,14 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 
 func (ur *UserRepository) GetUserByEmail(email string) (models.User, error) {
 	var user models.User
-	err := ur.db.QueryRow(`SELECT * FROM users WHERE email=$1`, email).Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Balance)
+	err := ur.db.QueryRow(`SELECT * FROM users WHERE email=$1`, email).Scan(&user.ID, &user.Username, &user.Email, &user.Password)
 
 	return user, err
 }
 
 func (ur *UserRepository) GetUserById(id int) (models.User, error) {
 	var user models.User
-	err := ur.db.QueryRow(`SELECT * FROM users WHERE id=$1`, id).Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Balance)
+	err := ur.db.QueryRow(`SELECT * FROM users WHERE id=$1`, id).Scan(&user.ID, &user.Username, &user.Email, &user.Password)
 
 	return user, err
 }
@@ -39,7 +39,7 @@ func (ur *UserRepository) GetAllUsers() ([]models.User, error) {
 	for rows.Next() {
 		var u models.User
 
-		err := rows.Scan(&u.ID, &u.Username, &u.Email, &u.Password, &u.Balance)
+		err := rows.Scan(&u.ID, &u.Username, &u.Email, &u.Password)
 		if err != nil {
 			return nil, err
 		}
