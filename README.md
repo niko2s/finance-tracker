@@ -23,4 +23,4 @@ Once the application is running, you can access it in your web browser by visiti
 
 ### Cleanup
 
-To stop and clean up everything after using the application, simply run: `docker-compose down`
+To stop and clean up everything after using the application, simply run: `docker-compose rm -fsv`
