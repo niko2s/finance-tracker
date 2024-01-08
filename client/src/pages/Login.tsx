@@ -31,7 +31,7 @@ function Login() {
 
   const login = async () => {
     const loginData = {
-      email: username,
+      email,
       password,
     };
     const jsonLoginData = JSON.stringify(loginData);
@@ -102,8 +102,8 @@ function Login() {
     e.preventDefault();
 
     if (isLogin) {
-      if (!username || !password) {
-        setMessage({ message: "Username and Password are required", color: "red" });
+      if (!email || !password) {
+        setMessage({ message: "Email and Password are required", color: "red" });
         return;
       }
       login();
@@ -130,21 +130,19 @@ function Login() {
         </h2>
 
         <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
-          <FormField
+          {!isLogin && (<FormField
             name="Username"
             type="text"
             state={username}
             setState={setUsername}
-          />
+          />)}
 
-          {!isLogin && (
-            <FormField
-              name="Email"
-              type="text"
-              state={email}
-              setState={setEmail}
-            />
-          )}
+          <FormField
+            name="Email"
+            type="text"
+            state={email}
+            setState={setEmail}
+          />
 
           <FormField
             name="Password"
