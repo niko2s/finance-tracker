@@ -5,13 +5,15 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile
+    image: niko2s/ft-client:latest
     ports:
-      - "5173:5173"
+      - "5174:80"
   
   server:
     build:
       context: ./server
       dockerfile: Dockerfile
+    image: niko2s/ft-server:latest
     ports:
       - "8080:8080"
     depends_on:
@@ -21,6 +23,7 @@ services:
       DEV_DB: postgres://user:password@db:5432/mydatabase?sslmode=disable
       AUTH_JWT_SECRET: asdfsdfasdfasdfasdfasdfasdfasdf #only for test purposes
       REFRESH_JWT_SECRET: qwerqwerqwerqwerqwerqwerqwerq #only for test purposes
+      ALLOWED_ORIGIN: http://localhost:5174
 
   db:
     image: postgres:latest

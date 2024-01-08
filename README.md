@@ -12,15 +12,31 @@ Before you begin, ensure you have met the following requirements:
 
 ### Installation
 
-1. Clone the repository `git clone https://github.com/niko2s/finance-tracker.git`
-2. Navigate to the project folder: `cd finance-tracker`
-3. Run the application using Docker and Docker Compose: `docker-compose up`
+1. Clone the repository 
+```bash
+git clone https://github.com/niko2s/finance-tracker.git
+```
+2. Navigate to the project folder
+```bash
+cd finance-tracker
+```
+3. Run the application using Docker and Docker Compose
+```bash
+docker-compose up
+``````
 
 
 ### Try it out
 
-Once the application is running, you can access it in your web browser by visiting: `localhost:5173`
+Once the application is running, you can access it in your web browser by visiting: [localhost:5174](http://localhost:5174)
 
 ### Cleanup
 
-To stop and clean up everything after using the application, simply run: `docker-compose rm -fsv`
+After you're done using the application, you can stop and clean up everything by running the following command: 
+```bash
+docker-compose down --rmi all -v
+``` 
+or remove everything except the Postgres image with:
+```bash
+docker-compose down --rmi local -v
+```
