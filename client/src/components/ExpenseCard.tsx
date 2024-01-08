@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import FormField from "./FormField";
 import useCustomFetch from "../hooks/customFetch";
 import apiPaths from "../api/paths";
+import { useUser } from "../context/UserContext";
 
 const ExpenseCard = ({
   category_id,
@@ -17,6 +18,7 @@ const ExpenseCard = ({
   const [value, setValue] = useState("");
   const [status, setStatus] = useState("");
   const customFetch = useCustomFetch();
+  const { updateBalance, setUpdateBalance } = useUser();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -55,6 +57,7 @@ const ExpenseCard = ({
         expense_sum.Float64 += Number(value);
         setTitle("");
         setValue("");
+        setUpdateBalance(!updateBalance);
       }
     } catch (error) {
       setStatus("An error occured when adding a new expense");

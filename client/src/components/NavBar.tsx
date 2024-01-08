@@ -6,7 +6,7 @@ import useCustomFetch from '../hooks/customFetch';
 const NavBar = () => {
 
     const customFetch = useCustomFetch();
-    const { user, setUser } = useUser();
+    const { user, setUser, balance } = useUser();
     const navigate = useNavigate();
 
 
@@ -36,7 +36,7 @@ const NavBar = () => {
                 {!!user && (
 
                     <div className="flex items-center space-x-3  ml-12">
-                        <p className="text-xl">0 €</p>
+                        <p className="text-xl">{balance} €</p>
                         <Link className="btn btn-ghost" to="/add-balance"><i className="material-icons">add</i></Link>
                     </div>
                 )}

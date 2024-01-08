@@ -8,6 +8,8 @@ export const UserContext = createContext<UserContextProps | undefined>(
 
 export const UserProvider: FC<UserProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [updateBalance, setUpdateBalance] = useState<boolean>(false);
+  const [balance, setBalance] = useState<number>(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -42,8 +44,39 @@ export const UserProvider: FC<UserProviderProps> = ({ children }) => {
     verifyUser();
   }, []);
 
+  useEffect(() => {
+    const fetchBalance = async () => {
+      try {
+        const response = await fetch(apiPaths.balance, {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (response.status === 401) {
+          console.log("User not authenticated")
+        }
+
+        if (response.status === 403) {
+          console.log("Invalid token")
+        }
+
+        if (response.ok) {
+          const data = (await response.json()) as number;
+          setBalance(data);
+        }
+
+      } catch (error) {
+        console.error("Failed to fetch balance", error); // network error
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBalance();
+  }, [user, updateBalance]);
+
   return (
-    <UserContext.Provider value={{ user, setUser }}>
+    <UserContext.Provider value={{ user, setUser, balance, updateBalance, setUpdateBalance }}>
       {!loading && children}
     </UserContext.Provider>
   );

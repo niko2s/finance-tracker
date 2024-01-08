@@ -50,9 +50,6 @@ const AddExpenseCategory = () => {
     e.preventDefault();
     if (title && value) {
       postCategory();
-      console.log("Submitted", { title, value });
-    } else {
-      console.warn("Value is required!");
     }
   };
   return (

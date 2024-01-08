@@ -32,6 +32,20 @@ func CreateSchema(db *sql.DB) error {
 		return err
 	}
 
+	createDepositTableSQL := `
+	CREATE TABLE IF NOT EXISTS deposit (
+		id SERIAL PRIMARY KEY,
+		title VARCHAR(100),
+		value FLOAT NOT NULL,
+		user_id INTEGER,
+		FOREIGN KEY (user_id) REFERENCES users (id)
+	);`
+
+	_, err = db.Exec(createDepositTableSQL)
+	if err != nil {
+		return err
+	}
+
 	createExpensesTableSQL := `
 	CREATE TABLE IF NOT EXISTS expenses (
 		id SERIAL PRIMARY KEY,

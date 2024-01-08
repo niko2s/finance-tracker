@@ -5,11 +5,12 @@ import (
 	"finance-tracker-server/handlers"
 	"finance-tracker-server/middleware"
 	"finance-tracker-server/repository"
+	"log"
+	"os"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"log"
-	"os"
 )
 
 func main() {
@@ -22,6 +23,7 @@ func main() {
 	expenseRepo := repository.NewExpenseRepository(database)
 	expenseOverviewRepo := repository.NewExpenseOverviewRepository(database)
 	refreshTokenRepo := repository.NewRefreshTokenRepository(database)
+	depositRepo := repository.NewDepositRepository(database)
 
 	if err != nil {
 		log.Fatal("Error at CreateSchema: " + err.Error())
@@ -78,7 +80,6 @@ func main() {
 			})
 
 			//expense
-			//all expenses for a category
 			auth.GET("/users/me/categories/:id/expenses", func(c *gin.Context) {
 				handlers.GetExpenses(c, expenseRepo, expenseOverviewRepo)
 			})
@@ -86,8 +87,26 @@ func main() {
 			auth.POST("/users/me/categories/:id/expenses", func(c *gin.Context) {
 				handlers.AddExpense(c, expenseRepo, expenseOverviewRepo)
 			})
+
+			//deposit
+			auth.GET("/users/me/deposit", func(c *gin.Context) {
+				handlers.GetDeposits(c, depositRepo)
+			})
+
+			auth.GET("/users/me/deposit/sum", func(c *gin.Context) {
+				handlers.GetSumOfDeposits(c, depositRepo)
+			})
+
+			auth.POST("/users/me/deposit", func(c *gin.Context) {
+				handlers.AddDeposit(c, depositRepo)
+			})
+
+			//balance
+			auth.GET("/users/me/balance", func(c *gin.Context) {
+				handlers.GetBalance(c, expenseOverviewRepo, depositRepo)
+			})
+
 		}
 	}
-
 	router.Run(":8080")
 }

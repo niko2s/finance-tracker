@@ -35,6 +35,9 @@ export interface LoginResponse {
 export interface UserContextProps {
   user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  balance: number;
+  updateBalance: boolean;
+  setUpdateBalance: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export interface UserProviderProps {

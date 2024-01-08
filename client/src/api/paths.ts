@@ -8,6 +8,10 @@ const apiPaths = {
     logout: `${API_BASE_URL}${API_VERSION}/logout`,
     currentUser: `${API_BASE_URL}${API_VERSION}/users/me`,
     categories: `${API_BASE_URL}${API_VERSION}/users/me/categories`,
+    deposit: `${API_BASE_URL}${API_VERSION}/users/me/deposit`,
+    depositSum: `${API_BASE_URL}${API_VERSION}/users/me/deposit/sum`,
+    balance: `${API_BASE_URL}${API_VERSION}/users/me/balance`,
+
     expensesByCategory: (categoryId: string | number) => `${API_BASE_URL}${API_VERSION}/users/me/categories/${categoryId}/expenses`,
 };
 

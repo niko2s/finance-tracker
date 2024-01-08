@@ -28,7 +28,7 @@ func (ur *UserRepository) GetUserById(id int) (models.User, error) {
 }
 
 func (ur *UserRepository) GetAllUsers() ([]models.User, error) {
-	rows, err := ur.db.Query(`SELECT id, username, email, balance FROM users`)
+	rows, err := ur.db.Query(`SELECT id, username, email FROM users`)
 	if err != nil {
 		return nil, err
 	}
