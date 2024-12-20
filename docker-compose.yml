@@ -1,4 +1,3 @@
-version: '3'
 services:
 
   client:
@@ -17,7 +16,8 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     restart: on-failure
     environment:
       DEV_DB: postgres://user:password@db:5432/mydatabase?sslmode=disable
@@ -31,5 +31,10 @@ services:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
       POSTGRES_DB: mydatabase
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d mydatabase"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     ports:
       - "5432:5432"
