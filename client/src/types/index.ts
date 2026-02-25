@@ -4,7 +4,7 @@ export interface User {
   id: number;
   username: string;
   email: string;
-  password: string;
+  password?: string;
 }
 
 export interface InfoMessage {
@@ -17,7 +17,7 @@ export interface ExpenseOverview {
   category_id: number;
   name: string;
   total: number;
-  expense_sum: goSqlNullFloat64;
+  expense_sum: GoSqlNullFloat64 | null;
 }
 
 export interface Expense {
@@ -35,6 +35,7 @@ export interface LoginResponse {
 export interface UserContextProps {
   user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  isAuthLoading: boolean;
   balance: number;
   updateBalance: boolean;
   setUpdateBalance: React.Dispatch<React.SetStateAction<boolean>>;
@@ -60,12 +61,13 @@ export interface ExpenseCardProps {
   category_id: number;
   name: string;
   total: number;
-  expense_sum: goSqlNullFloat64;
+  expense_sum: GoSqlNullFloat64 | null;
 }
 
-export interface goSqlNullFloat64 {
+export interface GoSqlNullFloat64 {
   Float64: number;
-  valid: boolean;
+  Valid?: boolean;
+  valid?: boolean;
 }
 
 export interface ModalProps {

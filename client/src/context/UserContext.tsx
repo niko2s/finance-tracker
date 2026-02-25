@@ -10,74 +10,94 @@ export const UserProvider: FC<UserProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [updateBalance, setUpdateBalance] = useState<boolean>(false);
   const [balance, setBalance] = useState<number>(0);
-  const [loading, setLoading] = useState(true);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
 
   useEffect(() => {
-    //verify user's authentication status (e.g. on reload)
+    let isCancelled = false;
+
+    // Verify user's authentication status (e.g. on reload).
     const verifyUser = async () => {
       try {
         const response = await fetch(apiPaths.currentUser, {
           method: "GET",
-          credentials: "include", // Include cookies
+          credentials: "include",
         });
 
         if (response.status === 401) {
-          console.log("User not authenticated")
+          setUser(null);
         }
 
         if (response.status === 403) {
-          console.log("Invalid token")
+          setUser(null);
         }
 
         if (response.ok) {
           const data = (await response.json()) as User;
-          setUser(data);
+          if (!isCancelled) {
+            setUser(data);
+          }
         }
-
       } catch (error) {
-        console.error("Failed to verify user", error); // network error
+        console.error("Failed to verify user", error);
       } finally {
-        setLoading(false);
+        if (!isCancelled) {
+          setIsAuthLoading(false);
+        }
       }
     };
 
-    verifyUser();
+    void verifyUser();
+
+    return () => {
+      isCancelled = true;
+    };
   }, []);
 
   useEffect(() => {
+    let isCancelled = false;
+
     const fetchBalance = async () => {
+      if (!user) {
+        setBalance(0);
+        return;
+      }
+
       try {
         const response = await fetch(apiPaths.balance, {
           method: "GET",
           credentials: "include",
         });
 
-        if (response.status === 401) {
-          console.log("User not authenticated")
-        }
-
-        if (response.status === 403) {
-          console.log("Invalid token")
-        }
-
         if (response.ok) {
           const data = (await response.json()) as number;
-          setBalance(data);
+          if (!isCancelled) {
+            setBalance(data);
+          }
         }
-
       } catch (error) {
-        console.error("Failed to fetch balance", error); // network error
-      } finally {
-        setLoading(false);
+        console.error("Failed to fetch balance", error);
       }
     };
 
-    fetchBalance();
+    void fetchBalance();
+
+    return () => {
+      isCancelled = true;
+    };
   }, [user, updateBalance]);
 
   return (
-    <UserContext.Provider value={{ user, setUser, balance, updateBalance, setUpdateBalance }}>
-      {!loading && children}
+    <UserContext.Provider
+      value={{
+        user,
+        setUser,
+        isAuthLoading,
+        balance,
+        updateBalance,
+        setUpdateBalance,
+      }}
+    >
+      {children}
     </UserContext.Provider>
   );
 };
