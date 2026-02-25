@@ -1,13 +1,15 @@
 # Build stage
-FROM golang:alpine AS build
+FROM golang:1.21-alpine AS build
 WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-RUN GOOS=linux go build -a -o main .
+RUN CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags="-s -w" -o main .
 
 # Production stage
-FROM alpine:latest  
-WORKDIR /root/
+FROM scratch
+WORKDIR /app
 COPY --from=build /app/main .
-CMD ["./main"]  
+USER 65532:65532
+EXPOSE 8080
+CMD ["./main"]
