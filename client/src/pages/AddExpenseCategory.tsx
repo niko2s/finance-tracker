@@ -9,24 +9,29 @@ const AddExpenseCategory = () => {
   const [title, setTitle] = useState("");
   const [value, setValue] = useState("");
   const [status, setStatus] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const customFetch = useCustomFetch();
-
-
   const { user } = useUser();
 
-  const postCategory = async () => {
+  const postCategory = async (name: string, total: number) => {
+    if (!user) {
+      setStatus("You must be logged in.");
+      return;
+    }
 
-    const registerBody = {
-      name: title,
-      total: parseFloat(value),
-      user_id: user?.id,
+    const requestBody = {
+      name,
+      total,
+      user_id: user.id,
     };
-    const jsonCategoryBody = JSON.stringify(registerBody);
+    const jsonCategoryBody = JSON.stringify(requestBody);
 
     try {
+      setIsSubmitting(true);
+      setStatus("");
+
       const response = await customFetch(apiPaths.categories, {
         method: "POST",
-        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -34,24 +39,33 @@ const AddExpenseCategory = () => {
       });
 
       if (!response.ok) {
-        setStatus("Adding failed!");
-        console.error("Network response not 200");
+        throw new Error(`Failed with status ${response.status}`);
       }
 
-      setStatus("Category " + title + " added successfully!");
+      setStatus(`Category ${name} added successfully!`);
       setTitle("");
       setValue("");
     } catch (error) {
       console.error("Fetch error:", error);
       setStatus("Adding failed!");
+    } finally {
+      setIsSubmitting(false);
     }
   };
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (title && value) {
-      postCategory();
+    const trimmedTitle = title.trim();
+    const numericLimit = Number(value);
+
+    if (!trimmedTitle || !Number.isFinite(numericLimit) || numericLimit <= 0) {
+      setStatus("Please enter a title and a limit greater than 0.");
+      return;
     }
+
+    void postCategory(trimmedTitle, numericLimit);
   };
+
   return (
     <div className="mt-6">
       <AddForm
@@ -73,6 +87,7 @@ const AddExpenseCategory = () => {
           state={value}
           setState={setValue}
         />
+        {isSubmitting && <p className="text-sm">Submitting...</p>}
       </AddForm>
     </div>
   );

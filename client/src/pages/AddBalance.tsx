@@ -3,45 +3,58 @@ import AddForm from "../components/AddForm";
 import { useUser } from "../context/UserContext";
 import FormField from "../components/FormField";
 import apiPaths from "../api/paths";
+import useCustomFetch from "../hooks/customFetch";
 
 const AddBalance = () => {
   const [title, setTitle] = useState("");
   const [value, setValue] = useState("");
   const [status, setStatus] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const customFetch = useCustomFetch();
 
-  const {balance, updateBalance , setUpdateBalance} = useUser();
+  const { balance, setUpdateBalance } = useUser();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (value) {
-      const addBalanceBody = {
-        title,
-        value: Number(value),
-      };
-  
-      const jsonAddBalanceBody = JSON.stringify(addBalanceBody);
-  
-      try {
-        const response = await fetch(apiPaths.deposit, {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: jsonAddBalanceBody,
-        });
-  
-        if (!response.ok) {
-          throw new Error("Network response not 200");
-        } else {
-          setTitle("");
-          setValue("");
-          setUpdateBalance(!updateBalance);
-          setStatus("Balance added successfully!");
-        }
-      } catch (error) {
-        console.error("Fetch error:", error);
+    const numericValue = Number(value);
+
+    if (!Number.isFinite(numericValue) || numericValue <= 0) {
+      setStatus("Please enter a value greater than 0.");
+      return;
+    }
+
+    const addBalanceBody = {
+      title,
+      value: numericValue,
+    };
+
+    const jsonAddBalanceBody = JSON.stringify(addBalanceBody);
+
+    try {
+      setIsSubmitting(true);
+      setStatus("");
+
+      const response = await customFetch(apiPaths.deposit, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: jsonAddBalanceBody,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed with status ${response.status}`);
       }
+
+      setTitle("");
+      setValue("");
+      setUpdateBalance((prev) => !prev);
+      setStatus("Balance added successfully!");
+    } catch (error) {
+      setStatus("Failed to add balance.");
+      console.error("Fetch error:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -57,6 +70,7 @@ const AddBalance = () => {
           state={value}
           setState={setValue}
         />
+        {isSubmitting && <p className="text-sm">Submitting...</p>}
       </AddForm>
     </div>
   );

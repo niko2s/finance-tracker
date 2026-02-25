@@ -12,6 +12,7 @@ function Login() {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<InfoMessage>({ message: "", color: "default" });
   const navigate = useNavigate();
   const customFetch = useCustomFetch();
@@ -26,7 +27,7 @@ function Login() {
     if (user) {
       navigate("/dashboard");
     }
-  }, [user]);
+  }, [user, navigate]);
 
 
   const login = async () => {
@@ -37,6 +38,9 @@ function Login() {
     const jsonLoginData = JSON.stringify(loginData);
 
     try {
+      setIsSubmitting(true);
+      setMessage({ message: "", color: "default" });
+
       //post login data, on successful login set cookies
       const responseLogin = await fetch(apiPaths.login, {
         method: "POST",
@@ -48,28 +52,31 @@ function Login() {
       });
 
       if (responseLogin.status === 401) {
-        setMessage({ message: "Wrong Username or Password!", color: "red" })
-        console.log("Wrong Username or Password!");
+        setMessage({ message: "Wrong email or password.", color: "red" });
+        return;
       }
 
-      if (responseLogin.ok) {
-        //get user data
-        const responseUser = await customFetch(apiPaths.currentUser, {
-          method: "GET",
-          credentials: "include",
-        });
-
-        if (responseUser.ok) {
-          const data = (await responseUser.json()) as User;
-          setUser(data);
-        }
+      if (!responseLogin.ok) {
+        throw new Error(`Login failed with status ${responseLogin.status}`);
       }
 
+      //get user data
+      const responseUser = await customFetch(apiPaths.currentUser, {
+        method: "GET",
+      });
+
+      if (!responseUser.ok) {
+        throw new Error(`Failed to load user with status ${responseUser.status}`);
+      }
+
+      const data = (await responseUser.json()) as User;
+      setUser(data);
     } catch (error) {
-      setMessage({ message: "Internal error occured!", color: "red" })
+      setMessage({ message: "Internal error occurred.", color: "red" });
       console.error("Fetch error:", error);
+    } finally {
+      setIsSubmitting(false);
     }
-
   };
 
   const register = async () => {
@@ -81,6 +88,9 @@ function Login() {
     const jsonRegisterBody = JSON.stringify(registerBody);
 
     try {
+      setIsSubmitting(true);
+      setMessage({ message: "", color: "default" });
+
       const response = await fetch(apiPaths.register, {
         method: "POST",
         credentials: "include",
@@ -91,14 +101,23 @@ function Login() {
       });
 
       if (!response.ok) {
-        throw new Error("Network response not 200");
+        throw new Error(`Register failed with status ${response.status}`);
       }
+
+      setMessage({ message: "Successfully registered new user!", color: "default" });
+      setUsername("");
+      setEmail("");
+      setPassword("");
+      setIsLogin(true);
     } catch (error) {
+      setMessage({ message: "Registration failed.", color: "red" });
       console.error("Fetch error:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (isLogin) {
@@ -106,19 +125,13 @@ function Login() {
         setMessage({ message: "Email and Password are required", color: "red" });
         return;
       }
-      login();
+      await login();
     } else {
       if (!username || !password || !email) {
         setMessage({ message: "Username, Email and Password are required", color: "red" });
         return;
       }
-      register();
-
-      setMessage({ message: "Successfully registered new user!", color: "default" });
-      setUsername("");
-      setEmail("");
-      setPassword("");
-      setIsLogin(true);
+      await register();
     }
   };
 
@@ -133,13 +146,15 @@ function Login() {
           {!isLogin && (<FormField
             name="Username"
             type="text"
+            required={true}
             state={username}
             setState={setUsername}
           />)}
 
           <FormField
             name="Email"
-            type="text"
+            type="email"
+            required={true}
             state={email}
             setState={setEmail}
           />
@@ -147,25 +162,36 @@ function Login() {
           <FormField
             name="Password"
             type="password"
+            required={true}
             state={password}
             setState={setPassword}
           />
 
-          {message && <div className={`text-sm text-center mt-2 ${message.color === 'red' ? 'text-red-500' : 'text-secondary'}`}>{message.message}</div>}
+          {message.message && (
+            <div
+              className={`text-sm text-center mt-2 ${
+                message.color === "red" ? "text-red-500" : "text-secondary"
+              }`}
+            >
+              {message.message}
+            </div>
+          )}
 
           <div>
-            <button type="submit" className="btn btn-primary w-full">
-              {isLogin ? "Sign in" : "Register"}
+            <button type="submit" className="btn btn-primary w-full" disabled={isSubmitting}>
+              {isSubmitting ? "Please wait..." : isLogin ? "Sign in" : "Register"}
             </button>
           </div>
         </form>
 
         <button
+          type="button"
           className="text-primary mt-4"
           onClick={() => {
             setIsLogin((isLogin) => !isLogin);
             setMessage({ message: "", color: "default" });
           }}
+          disabled={isSubmitting}
         >
           {isLogin
             ? "Need an account? Register"

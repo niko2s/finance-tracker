@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Modal from "./Modal";
 import { ExpenseCardProps } from "../types";
 import AddForm from "./AddForm";
@@ -17,60 +17,74 @@ const ExpenseCard = ({
   const [title, setTitle] = useState("");
   const [value, setValue] = useState("");
   const [status, setStatus] = useState("");
+  const [spent, setSpent] = useState(expense_sum?.Float64 ?? 0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const customFetch = useCustomFetch();
-  const { updateBalance, setUpdateBalance } = useUser();
+  const { setUpdateBalance } = useUser();
+
+  useEffect(() => {
+    setSpent(expense_sum?.Float64 ?? 0);
+  }, [expense_sum?.Float64]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!value) {
-      setStatus("Value required!");
+    const numericValue = Number(value);
+    if (!Number.isFinite(numericValue) || numericValue <= 0) {
+      setStatus("Please enter a value greater than 0.");
       return;
     }
-    addExpense();
+
+    void addExpense(numericValue);
   };
 
-  const addExpense = async () => {
-
+  const addExpense = async (numericValue: number) => {
     const addExpenseBody = {
       title,
-      value: Number(value),
+      value: numericValue,
       expense_category_id: category_id,
     };
 
     const jsonAddExpenseBody = JSON.stringify(addExpenseBody);
 
     try {
-      const response = await customFetch(apiPaths.expensesByCategory(category_id), {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: jsonAddExpenseBody,
-      });
+      setIsSubmitting(true);
+      setStatus("");
+
+      const response = await customFetch(
+        apiPaths.expensesByCategory(category_id),
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: jsonAddExpenseBody,
+        }
+      );
 
       if (!response.ok) {
-        throw new Error("Network response not 200");
-      } else {
-        setStatus("Expense added successfully!");
-        expense_sum.Float64 += Number(value);
-        setTitle("");
-        setValue("");
-        setUpdateBalance(!updateBalance);
+        throw new Error(`Failed with status ${response.status}`);
       }
+
+      setStatus("Expense added successfully!");
+      setSpent((prev) => prev + numericValue);
+      setTitle("");
+      setValue("");
+      setUpdateBalance((prev) => !prev);
     } catch (error) {
-      setStatus("An error occured when adding a new expense");
+      setStatus("An error occurred when adding a new expense.");
       console.error("Fetch error:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  //calculate width of progressbar
+  // Calculate width of progressbar.
   let withinLimit = true;
-  let widthPercentage = "0";
-  if (expense_sum && total) {
-    const ratio = expense_sum.Float64 / total;
-    widthPercentage = String(Math.min(ratio * 100, 100));
+  let widthPercentage = 0;
+  if (total > 0) {
+    const ratio = spent / total;
+    widthPercentage = Math.min(ratio * 100, 100);
     if (ratio > 1) withinLimit = false;
   }
 
@@ -81,11 +95,12 @@ const ExpenseCard = ({
           <h2 className="card-title">{name}</h2>
 
           <p className="text-end">
-            {expense_sum.Float64}/{total}€
+            {spent}/{total}€
           </p>
           <progress
-            className={`progress w-full mt-1 mb-3 ${withinLimit ? "progress-primary" : "progress-error"
-              }`}
+            className={`progress w-full mt-1 mb-3 ${
+              withinLimit ? "progress-primary" : "progress-error"
+            }`}
             value={widthPercentage}
             max="100"
           />
@@ -98,9 +113,13 @@ const ExpenseCard = ({
             </Link>
             <button
               onClick={() => {
-                (document.getElementById(`modal-${category_id}`) as HTMLDialogElement).showModal()
+                const dialog = document.getElementById(
+                  `modal-${category_id}`
+                ) as HTMLDialogElement | null;
+                dialog?.showModal();
               }}
               className="btn btn-outline inline-flex items-center"
+              disabled={isSubmitting}
             >
               <i className="material-icons">add</i>
             </button>
@@ -108,9 +127,10 @@ const ExpenseCard = ({
         </div>
       </div>
 
-
       <Modal id={`modal-${category_id}`} onClose={() => {
-        setStatus(""), setValue(""), setTitle("");
+        setStatus("");
+        setValue("");
+        setTitle("");
       }}>
         <AddForm
           title={`Add an expense to ${name}`}
@@ -133,8 +153,6 @@ const ExpenseCard = ({
           />
         </AddForm>
       </Modal>
-
-
     </>
   );
 };
