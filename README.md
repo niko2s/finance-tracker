@@ -22,8 +22,8 @@ cd finance-tracker
 ```
 3. Run the application using Docker and Docker Compose
 ```bash
-docker-compose up
-``````
+docker compose up
+```
 
 
 ### Try it out
@@ -32,11 +32,17 @@ Once the application is running, you can access it in your web browser by visiti
 
 ### Cleanup
 
-After you're done using the application, you can stop and clean up everything by running the following command: 
+Stop the application and remove containers/network:
 ```bash
-docker-compose down --rmi all -v
-``` 
-or remove everything except the Postgres image with:
+docker compose down
+```
+
+Stop the application and also remove the database volume (deletes all stored data):
 ```bash
-docker-compose down --rmi local -v
+docker compose down -v
+```
+
+Remove containers, network, volumes, and all images used by the project:
+```bash
+docker compose down --rmi all -v
 ```
