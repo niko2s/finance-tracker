@@ -7,40 +7,48 @@ import useCustomFetch from "../hooks/customFetch";
 import apiPaths from "../api/paths";
 
 const UserProfile = () => {
-  const { user } = useUser();
+  const { user, updateBalance } = useUser();
 
   const customFetch = useCustomFetch();
   const [expenseOverviews, setExpenseOverviews] = useState<ExpenseOverview[]>(
     []
   );
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
-
       // When user logged out, do not fetch
       if (!user) {
+        setExpenseOverviews([]);
+        setIsLoading(false);
         return;
       }
 
       try {
+        setIsLoading(true);
+        setError("");
+
         const response = await customFetch(apiPaths.categories, {
           method: "GET",
-          credentials: "include",
         });
 
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
-        const data = (await response.json()) as ExpenseOverview[];
-        setExpenseOverviews(data);
+        const data = (await response.json()) as ExpenseOverview[] | null;
+        setExpenseOverviews(Array.isArray(data) ? data : []);
       } catch (error) {
+        setError("Failed to load categories.");
         console.error("Failed to fetch data", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchData();
-  }, []);
+    void fetchData();
+  }, [customFetch, updateBalance, user]);
 
   return (
     <div>
@@ -53,6 +61,16 @@ const UserProfile = () => {
           <span>Category</span>
         </Link>
       </div>
+
+      {error && <p className="text-center text-error">{error}</p>}
+      {isLoading && (
+        <div className="flex justify-center py-6">
+          <span className="loading loading-spinner loading-md" />
+        </div>
+      )}
+      {!isLoading && !error && expenseOverviews.length === 0 && (
+        <p className="text-center py-6">No expense categories yet.</p>
+      )}
 
       <ul className="flex flex-wrap items-center justify-center">
         {expenseOverviews?.map((ec: ExpenseOverview) => {
