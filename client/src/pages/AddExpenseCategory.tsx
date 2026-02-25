@@ -4,6 +4,7 @@ import { useUser } from "../context/UserContext";
 import FormField from "../components/FormField";
 import useCustomFetch from "../hooks/customFetch";
 import apiPaths from "../api/paths";
+import { parseEuroInputToCents } from "../utils/money";
 
 const AddExpenseCategory = () => {
   const [title, setTitle] = useState("");
@@ -13,7 +14,7 @@ const AddExpenseCategory = () => {
   const customFetch = useCustomFetch();
   const { user } = useUser();
 
-  const postCategory = async (name: string, total: number) => {
+  const postCategory = async (name: string, totalCents: number) => {
     if (!user) {
       setStatus("You must be logged in.");
       return;
@@ -21,7 +22,7 @@ const AddExpenseCategory = () => {
 
     const requestBody = {
       name,
-      total,
+      total: totalCents,
       user_id: user.id,
     };
     const jsonCategoryBody = JSON.stringify(requestBody);
@@ -56,14 +57,14 @@ const AddExpenseCategory = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const trimmedTitle = title.trim();
-    const numericLimit = Number(value);
+    const totalCents = parseEuroInputToCents(value);
 
-    if (!trimmedTitle || !Number.isFinite(numericLimit) || numericLimit <= 0) {
-      setStatus("Please enter a title and a limit greater than 0.");
+    if (!trimmedTitle || totalCents === null || totalCents <= 0) {
+      setStatus("Please enter a title and valid limit (max 2 decimals).");
       return;
     }
 
-    void postCategory(trimmedTitle, numericLimit);
+    void postCategory(trimmedTitle, totalCents);
   };
 
   return (

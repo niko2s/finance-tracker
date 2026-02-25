@@ -17,7 +17,7 @@ export interface ExpenseOverview {
   category_id: number;
   name: string;
   total: number;
-  expense_sum: GoSqlNullFloat64 | null;
+  expense_sum: GoSqlNullInt64 | null;
 }
 
 export interface Expense {
@@ -61,11 +61,11 @@ export interface ExpenseCardProps {
   category_id: number;
   name: string;
   total: number;
-  expense_sum: GoSqlNullFloat64 | null;
+  expense_sum: GoSqlNullInt64 | null;
 }
 
-export interface GoSqlNullFloat64 {
-  Float64: number;
+export interface GoSqlNullInt64 {
+  Int64: number;
   Valid?: boolean;
   valid?: boolean;
 }

@@ -7,6 +7,7 @@ import FormField from "./FormField";
 import useCustomFetch from "../hooks/customFetch";
 import apiPaths from "../api/paths";
 import { useUser } from "../context/UserContext";
+import { formatCentsToEuro, parseEuroInputToCents } from "../utils/money";
 
 const ExpenseCard = ({
   category_id,
@@ -17,31 +18,31 @@ const ExpenseCard = ({
   const [title, setTitle] = useState("");
   const [value, setValue] = useState("");
   const [status, setStatus] = useState("");
-  const [spent, setSpent] = useState(expense_sum?.Float64 ?? 0);
+  const [spent, setSpent] = useState(expense_sum?.Int64 ?? 0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const customFetch = useCustomFetch();
   const { setUpdateBalance } = useUser();
 
   useEffect(() => {
-    setSpent(expense_sum?.Float64 ?? 0);
-  }, [expense_sum?.Float64]);
+    setSpent(expense_sum?.Int64 ?? 0);
+  }, [expense_sum?.Int64]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const numericValue = Number(value);
-    if (!Number.isFinite(numericValue) || numericValue <= 0) {
-      setStatus("Please enter a value greater than 0.");
+    const valueCents = parseEuroInputToCents(value);
+    if (valueCents === null || valueCents <= 0) {
+      setStatus("Please enter a valid amount with max 2 decimals.");
       return;
     }
 
-    void addExpense(numericValue);
+    void addExpense(valueCents);
   };
 
-  const addExpense = async (numericValue: number) => {
+  const addExpense = async (valueCents: number) => {
     const addExpenseBody = {
       title,
-      value: numericValue,
+      value: valueCents,
       expense_category_id: category_id,
     };
 
@@ -67,7 +68,7 @@ const ExpenseCard = ({
       }
 
       setStatus("Expense added successfully!");
-      setSpent((prev) => prev + numericValue);
+      setSpent((prev) => prev + valueCents);
       setTitle("");
       setValue("");
       setUpdateBalance((prev) => !prev);
@@ -95,7 +96,7 @@ const ExpenseCard = ({
           <h2 className="card-title">{name}</h2>
 
           <p className="text-end">
-            {spent}/{total}€
+            {formatCentsToEuro(spent)}/{formatCentsToEuro(total)}€
           </p>
           <progress
             className={`progress w-full mt-1 mb-3 ${

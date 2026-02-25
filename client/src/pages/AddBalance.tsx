@@ -4,6 +4,7 @@ import { useUser } from "../context/UserContext";
 import FormField from "../components/FormField";
 import apiPaths from "../api/paths";
 import useCustomFetch from "../hooks/customFetch";
+import { formatCentsToEuro, parseEuroInputToCents } from "../utils/money";
 
 const AddBalance = () => {
   const [title, setTitle] = useState("");
@@ -16,16 +17,15 @@ const AddBalance = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const numericValue = Number(value);
-
-    if (!Number.isFinite(numericValue) || numericValue <= 0) {
-      setStatus("Please enter a value greater than 0.");
+    const valueCents = parseEuroInputToCents(value);
+    if (valueCents === null || valueCents <= 0) {
+      setStatus("Please enter a valid amount with max 2 decimals.");
       return;
     }
 
     const addBalanceBody = {
       title,
-      value: numericValue,
+      value: valueCents,
     };
 
     const jsonAddBalanceBody = JSON.stringify(addBalanceBody);
@@ -64,7 +64,7 @@ const AddBalance = () => {
         <FormField name="Title" type="text" state={title} setState={setTitle} />
         <FormField
           name="Value"
-          info={`Current balance: ${balance} €`}
+          info={`Current balance: ${formatCentsToEuro(balance)} €`}
           type="number"
           required={true}
           state={value}

@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { Expense } from "../types";
 import useCustomFetch from "../hooks/customFetch";
 import apiPaths from "../api/paths";
+import { formatCentsToEuro } from "../utils/money";
 
 const ExpenseCategory = () => {
   const { id } = useParams();
@@ -70,7 +71,7 @@ const ExpenseCategory = () => {
               return (
                 <li key={e.id} className="flex justify-between py-4">
                   <span className="text-lg">{e.title || "Untitled"}</span>
-                  <span className="text-lg">{e.value} €</span>
+                  <span className="text-lg">{formatCentsToEuro(e.value)} €</span>
                 </li>
               );
             })}

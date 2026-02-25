@@ -2,16 +2,14 @@ import { Link, useNavigate } from "react-router-dom";
 import apiPaths from "../api/paths";
 import { useUser } from "../context/UserContext";
 import useCustomFetch from "../hooks/customFetch";
+import { formatCentsToEuro } from "../utils/money";
 
 const NavBar = () => {
   const customFetch = useCustomFetch();
   const { user, setUser, balance } = useUser();
   const navigate = useNavigate();
 
-  const formattedBalance = new Intl.NumberFormat(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(balance);
+  const formattedBalance = formatCentsToEuro(balance);
 
   const handleLogout = async () => {
     try {
