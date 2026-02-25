@@ -13,19 +13,15 @@ func NewExpenseOverviewRepository(db *sql.DB) *ExpenseOverviewRepository {
 	return &ExpenseOverviewRepository{db}
 }
 
-func (eor *ExpenseOverviewRepository) GetExpenseSumByUser(userId int) (float64, error) {
-	var expenseSum sql.NullFloat64
-	err := eor.db.QueryRow(`SELECT SUM(sum_expenses) FROM ExpenseOverview WHERE user_id=$1`, userId).Scan(&expenseSum)
+func (eor *ExpenseOverviewRepository) GetExpenseSumByUser(userId int) (int64, error) {
+	var expenseSum int64
+	err := eor.db.QueryRow(`SELECT COALESCE(SUM(sum_expenses), 0)::BIGINT FROM ExpenseOverview WHERE user_id=$1`, userId).Scan(&expenseSum)
 
 	if err != nil {
 		return 0, err
 	}
 
-	if !expenseSum.Valid {
-		return 0, nil
-	}
-
-	return expenseSum.Float64, nil
+	return expenseSum, nil
 }
 
 func (eor *ExpenseOverviewRepository) GetAllExpenseCategoriesByUserId(userId int) ([]models.ExpenseOverview, error) {

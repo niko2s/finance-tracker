@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"finance-tracker-server/helpers"
 	"finance-tracker-server/models"
 	"finance-tracker-server/repository"
@@ -28,6 +29,10 @@ func AddExpenseCategory(c *gin.Context, ecr *repository.ExpenseCategoryRepositor
 
 	err := services.AddExpenseCategory(ecr, newExpenseCategory)
 	if err != nil {
+		if errors.Is(err, helpers.ErrBadRequest) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert category"})
 		return
 	}

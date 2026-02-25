@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"finance-tracker-server/helpers"
 	"finance-tracker-server/models"
 	"finance-tracker-server/repository"
@@ -32,6 +33,10 @@ func AddDeposit(c *gin.Context, dr *repository.DepositRepository) {
 	deposit.UserId = userId
 	err = services.AddDeposit(dr, deposit)
 	if err != nil {
+		if errors.Is(err, helpers.ErrBadRequest) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal error occured!"})
 		return
 	}
@@ -40,7 +45,7 @@ func AddDeposit(c *gin.Context, dr *repository.DepositRepository) {
 
 func GetSumOfDeposits(c *gin.Context, dr *repository.DepositRepository) {
 	userId := c.GetInt("userId")
-	sum, err := dr.GetSumOfDepositsByUser(userId)
+	sum, err := services.GetSumOfDepositsByUser(dr, userId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal error occured!"})
 		return

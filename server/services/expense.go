@@ -30,6 +30,9 @@ func AddExpense(er *repository.ExpenseRepository, eor *repository.ExpenseOvervie
 		return err
 	}
 
+	if err := validateMoneyCents(newExpense.Value); err != nil {
+		return err
+	}
 	err = er.AddNewExpense(newExpense)
 	if err != nil {
 		log.Printf("Error add new expense: %v", err)

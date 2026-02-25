@@ -8,6 +8,9 @@ import (
 )
 
 func AddExpenseCategory(ecr *repository.ExpenseCategoryRepository, newExpenseCategory models.ExpenseCategory) error {
+	if err := validateMoneyCents(newExpenseCategory.Total); err != nil {
+		return err
+	}
 	err := ecr.AddNewExpenseCategory(newExpenseCategory)
 	if err != nil {
 		log.Printf("Error add expense category: %v", err)

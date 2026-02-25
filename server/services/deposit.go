@@ -7,6 +7,10 @@ import (
 )
 
 func AddDeposit(dr *repository.DepositRepository, newDeposit models.Deposit) error {
+	if err := validateMoneyCents(newDeposit.Value); err != nil {
+		return err
+	}
+
 	err := dr.AddDeposit(newDeposit)
 	if err != nil {
 		log.Printf("Error add new deposits: %v", err)
@@ -25,7 +29,7 @@ func GetAllDepositsByUser(dr *repository.DepositRepository, userId int) ([]model
 	return deposits, nil
 }
 
-func GetSumOfDepositsByUser(dr *repository.DepositRepository, userId int) (float64, error) {
+func GetSumOfDepositsByUser(dr *repository.DepositRepository, userId int) (int64, error) {
 	sum, err := dr.GetSumOfDepositsByUser(userId)
 	if err != nil {
 		log.Printf("Error get sum of deposits by user: %v", err)

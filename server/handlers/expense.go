@@ -55,6 +55,9 @@ func GetExpenses(c *gin.Context, er *repository.ExpenseRepository, eor *reposito
 }
 
 func parseError(err error) (int, string) {
+	if errors.Is(err, helpers.ErrBadRequest) {
+		return http.StatusBadRequest, err.Error()
+	}
 	if errors.Is(err, helpers.ErrForbidden) {
 		return http.StatusForbidden, err.Error()
 	} else {

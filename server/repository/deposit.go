@@ -42,18 +42,14 @@ func (br *DepositRepository) GetAllDepositsByUser(userId int) ([]models.Deposit,
 	return deposits, nil
 }
 
-func (br *DepositRepository) GetSumOfDepositsByUser(userId int) (float64, error) {
-	row := br.db.QueryRow(`SELECT SUM(value) FROM deposit WHERE user_id=$1`, userId)
+func (br *DepositRepository) GetSumOfDepositsByUser(userId int) (int64, error) {
+	row := br.db.QueryRow(`SELECT COALESCE(SUM(value), 0)::BIGINT FROM deposit WHERE user_id=$1`, userId)
 
-	var sum sql.NullFloat64
+	var sum int64
 	err := row.Scan(&sum)
 	if err != nil {
 		return 0, err
 	}
 
-	if !sum.Valid {
-        return 0, nil
-    }
-
-	return sum.Float64, nil
+	return sum, nil
 }

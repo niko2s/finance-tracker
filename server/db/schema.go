@@ -22,7 +22,7 @@ func CreateSchema(db *sql.DB) error {
 	CREATE TABLE IF NOT EXISTS expense_categories (
 		id SERIAL PRIMARY KEY,
 		name VARCHAR(50) NOT NULL,
-		total FLOAT NOT NULL,
+		total BIGINT NOT NULL,
 		user_id INTEGER,
 		FOREIGN KEY (user_id) REFERENCES users (id)
 	);`
@@ -36,7 +36,7 @@ func CreateSchema(db *sql.DB) error {
 	CREATE TABLE IF NOT EXISTS deposit (
 		id SERIAL PRIMARY KEY,
 		title VARCHAR(100),
-		value FLOAT NOT NULL,
+		value BIGINT NOT NULL,
 		user_id INTEGER,
 		FOREIGN KEY (user_id) REFERENCES users (id)
 	);`
@@ -50,7 +50,7 @@ func CreateSchema(db *sql.DB) error {
 	CREATE TABLE IF NOT EXISTS expenses (
 		id SERIAL PRIMARY KEY,
 		title VARCHAR(100),
-		value FLOAT NOT NULL,
+		value BIGINT NOT NULL,
 		expense_category_id INTEGER,
 		FOREIGN KEY (expense_category_id) REFERENCES expense_categories (id)
 	);`
@@ -82,7 +82,7 @@ func CreateSchema(db *sql.DB) error {
         ec.id AS category_id,
         ec.name AS category_name,
         ec.total AS category_total,
-        SUM(e.value) AS sum_expenses
+        SUM(e.value)::BIGINT AS sum_expenses
     FROM
         expense_categories ec
     LEFT JOIN
