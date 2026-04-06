@@ -75,6 +75,10 @@ func main() {
 				handlers.AddExpenseCategory(c, expenseCategoryRepo)
 			})
 
+			auth.DELETE("/users/me/categories/:id", func(c *gin.Context) {
+				handlers.DeleteExpenseCategory(c, expenseCategoryRepo, expenseOverviewRepo)
+			})
+
 			//expense
 			auth.GET("/users/me/categories/:id/expenses", func(c *gin.Context) {
 				handlers.GetExpenses(c, expenseRepo, expenseOverviewRepo)
@@ -82,6 +86,10 @@ func main() {
 
 			auth.POST("/users/me/categories/:id/expenses", func(c *gin.Context) {
 				handlers.AddExpense(c, expenseRepo, expenseOverviewRepo)
+			})
+
+			auth.DELETE("/users/me/categories/:id/expenses/:expenseId", func(c *gin.Context) {
+				handlers.DeleteExpense(c, expenseRepo, expenseOverviewRepo)
 			})
 
 			//deposit
@@ -95,6 +103,10 @@ func main() {
 
 			auth.POST("/users/me/deposit", func(c *gin.Context) {
 				handlers.AddDeposit(c, depositRepo)
+			})
+
+			auth.DELETE("/users/me/deposit/:id", func(c *gin.Context) {
+				handlers.DeleteDeposit(c, depositRepo)
 			})
 
 			//balance

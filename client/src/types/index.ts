@@ -24,7 +24,8 @@ export interface Expense {
   id: number;
   title?: string | null;
   value: number;
-  category: number;
+  category?: number;
+  expense_category_id?: number;
 }
 
 export interface Deposit {

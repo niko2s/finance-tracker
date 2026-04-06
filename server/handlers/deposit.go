@@ -7,6 +7,7 @@ import (
 	"finance-tracker-server/repository"
 	"finance-tracker-server/services"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -51,4 +52,26 @@ func GetSumOfDeposits(c *gin.Context, dr *repository.DepositRepository) {
 		return
 	}
 	c.JSON(http.StatusOK, sum)
+}
+
+func DeleteDeposit(c *gin.Context, dr *repository.DepositRepository) {
+	depositId := c.Param("id")
+	intDepositId, err := strconv.Atoi(depositId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Parameter not an integer"})
+		return
+	}
+
+	userId := c.GetInt("userId")
+	err = services.DeleteDeposit(dr, intDepositId, userId)
+	if err != nil {
+		if errors.Is(err, helpers.ErrBadRequest) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal error occured!"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Deposit deleted successfully!"})
 }

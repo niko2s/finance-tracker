@@ -54,6 +54,33 @@ func GetExpenses(c *gin.Context, er *repository.ExpenseRepository, eor *reposito
 	c.JSON(http.StatusOK, expenses)
 }
 
+func DeleteExpense(c *gin.Context, er *repository.ExpenseRepository, eor *repository.ExpenseOverviewRepository) {
+	categoryId := c.Param("id")
+	expenseId := c.Param("expenseId")
+
+	intCategoryId, err := strconv.Atoi(categoryId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Category parameter not an integer"})
+		return
+	}
+
+	intExpenseId, err := strconv.Atoi(expenseId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Expense parameter not an integer"})
+		return
+	}
+
+	userId := helpers.GetUserIdFromContext(c)
+	err = services.DeleteExpense(er, eor, intCategoryId, intExpenseId, userId)
+	if err != nil {
+		code, msg := parseError(err)
+		c.JSON(code, gin.H{"error": msg})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Expense deleted!"})
+}
+
 func parseError(err error) (int, string) {
 	if errors.Is(err, helpers.ErrBadRequest) {
 		return http.StatusBadRequest, err.Error()

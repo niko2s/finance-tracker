@@ -58,7 +58,7 @@ func (eor *ExpenseOverviewRepository) GetUserIdByCategoryId(categoryId int) (int
 
 	err := row.Scan(&userId)
 	if err != nil {
-		return -1, nil
+		return -1, err
 	}
 
 	return userId, nil

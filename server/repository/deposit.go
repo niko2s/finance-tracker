@@ -53,3 +53,17 @@ func (br *DepositRepository) GetSumOfDepositsByUser(userId int) (int64, error) {
 
 	return sum, nil
 }
+
+func (br *DepositRepository) DeleteDepositByIDAndUser(depositId int, userId int) (bool, error) {
+	result, err := br.db.Exec(`DELETE FROM deposit WHERE id=$1 AND user_id=$2`, depositId, userId)
+	if err != nil {
+		return false, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+
+	return rowsAffected > 0, nil
+}

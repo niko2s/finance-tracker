@@ -43,3 +43,21 @@ func (er *ExpenseRepository) GetAllExpensesByExpenseCategoryId(expenseCategoryId
 	}
 	return expenses, nil
 }
+
+func (er *ExpenseRepository) DeleteExpenseByIDAndCategory(expenseId int, expenseCategoryId int) (bool, error) {
+	result, err := er.db.Exec(
+		`DELETE FROM expenses WHERE id=$1 AND expense_category_id=$2`,
+		expenseId,
+		expenseCategoryId,
+	)
+	if err != nil {
+		return false, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+
+	return rowsAffected > 0, nil
+}

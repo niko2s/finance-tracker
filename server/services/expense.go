@@ -54,3 +54,21 @@ func GetExpensesByCategoryId(er *repository.ExpenseRepository, eor *repository.E
 	}
 	return expenses, err
 }
+
+func DeleteExpense(er *repository.ExpenseRepository, eor *repository.ExpenseOverviewRepository, categoryId int, expenseId int, userId int) error {
+	if err := checkIfForbidden(eor, categoryId, userId); err != nil {
+		return err
+	}
+
+	deleted, err := er.DeleteExpenseByIDAndCategory(expenseId, categoryId)
+	if err != nil {
+		log.Printf("Error delete expense: %v", err)
+		return helpers.ErrInternal
+	}
+
+	if !deleted {
+		return helpers.WrapBadRequestError("expense not found")
+	}
+
+	return nil
+}

@@ -1,6 +1,7 @@
 package services
 
 import (
+	"finance-tracker-server/helpers"
 	"finance-tracker-server/models"
 	"finance-tracker-server/repository"
 	"log"
@@ -36,4 +37,18 @@ func GetSumOfDepositsByUser(dr *repository.DepositRepository, userId int) (int64
 		return 0, err
 	}
 	return sum, nil
+}
+
+func DeleteDeposit(dr *repository.DepositRepository, depositId int, userId int) error {
+	deleted, err := dr.DeleteDepositByIDAndUser(depositId, userId)
+	if err != nil {
+		log.Printf("Error delete deposit by user: %v", err)
+		return helpers.ErrInternal
+	}
+
+	if !deleted {
+		return helpers.WrapBadRequestError("deposit not found")
+	}
+
+	return nil
 }

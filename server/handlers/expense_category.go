@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 func AddExpenseCategory(c *gin.Context, ecr *repository.ExpenseCategoryRepository) {
@@ -49,4 +50,30 @@ func GetExpenseCategories(c *gin.Context, eor *repository.ExpenseOverviewReposit
 	}
 
 	c.JSON(http.StatusOK, categories)
+}
+
+func DeleteExpenseCategory(c *gin.Context, ecr *repository.ExpenseCategoryRepository, eor *repository.ExpenseOverviewRepository) {
+	categoryId := c.Param("id")
+	intCategoryId, err := strconv.Atoi(categoryId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Parameter not an integer"})
+		return
+	}
+
+	userId := helpers.GetUserIdFromContext(c)
+	err = services.DeleteExpenseCategory(ecr, eor, intCategoryId, userId)
+	if err != nil {
+		if errors.Is(err, helpers.ErrBadRequest) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		if errors.Is(err, helpers.ErrForbidden) {
+			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete category"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Category deleted!"})
 }

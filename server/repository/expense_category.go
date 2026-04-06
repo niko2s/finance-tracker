@@ -44,3 +44,43 @@ func (ecr *ExpenseCategoryRepository) GetAllExpenseCategoriesByUserId(userId int
 
 	return expenseCategories, nil
 }
+
+func (ecr *ExpenseCategoryRepository) DeleteExpenseCategoryAndExpenses(categoryId int, userId int) (bool, error) {
+	tx, err := ecr.db.Begin()
+	if err != nil {
+		return false, err
+	}
+
+	_, err = tx.Exec(`DELETE FROM expenses WHERE expense_category_id=$1`, categoryId)
+	if err != nil {
+		_ = tx.Rollback()
+		return false, err
+	}
+
+	result, err := tx.Exec(
+		`DELETE FROM expense_categories WHERE id=$1 AND user_id=$2`,
+		categoryId,
+		userId,
+	)
+	if err != nil {
+		_ = tx.Rollback()
+		return false, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		_ = tx.Rollback()
+		return false, err
+	}
+
+	if rowsAffected == 0 {
+		_ = tx.Rollback()
+		return false, nil
+	}
+
+	if err := tx.Commit(); err != nil {
+		return false, err
+	}
+
+	return true, nil
+}

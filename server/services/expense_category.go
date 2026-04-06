@@ -1,6 +1,8 @@
 package services
 
 import (
+	"database/sql"
+	"errors"
 	"finance-tracker-server/helpers"
 	"finance-tracker-server/models"
 	"finance-tracker-server/repository"
@@ -30,7 +32,33 @@ func GetUserIdByCategoryId(eor *repository.ExpenseOverviewRepository, categoryId
 	userId, err := eor.GetUserIdByCategoryId(categoryId)
 	if err != nil {
 		log.Printf("Error get userid by categoryid: %v", err)
+		if errors.Is(err, sql.ErrNoRows) {
+			return -1, helpers.WrapBadRequestError("category not found")
+		}
 		return -1, helpers.ErrInternal
 	}
 	return userId, nil
+}
+
+func DeleteExpenseCategory(ecr *repository.ExpenseCategoryRepository, eor *repository.ExpenseOverviewRepository, categoryId int, userId int) error {
+	categoryOwnerId, err := GetUserIdByCategoryId(eor, categoryId)
+	if err != nil {
+		return err
+	}
+
+	if categoryOwnerId != userId {
+		return helpers.ErrForbidden
+	}
+
+	deleted, err := ecr.DeleteExpenseCategoryAndExpenses(categoryId, userId)
+	if err != nil {
+		log.Printf("Error delete expense category: %v", err)
+		return helpers.ErrInternal
+	}
+
+	if !deleted {
+		return helpers.WrapBadRequestError("category not found")
+	}
+
+	return nil
 }
