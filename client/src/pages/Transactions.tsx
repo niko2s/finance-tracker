@@ -7,18 +7,19 @@ import { formatCentsToEuro } from "../utils/money";
 
 interface TransactionItem {
   key: string;
+  id: number;
   title: string;
   subtitle: string;
   category: string;
   type: "Deposit" | "Expense";
   amount: number;
-  recordLabel: string;
   order: number;
+  categoryId?: number;
 }
 
 const Transactions = () => {
   const customFetch = useCustomFetch();
-  const { user, balance } = useUser();
+  const { user, balance, setUpdateBalance } = useUser();
 
   const [transactions, setTransactions] = useState<TransactionItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -26,6 +27,8 @@ const Transactions = () => {
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<"All" | "Deposit" | "Expense">("All");
   const [categoryFilter, setCategoryFilter] = useState("All");
+  const [actionStatus, setActionStatus] = useState("");
+  const [deletingKey, setDeletingKey] = useState("");
 
   useEffect(() => {
     const fetchTransactions = async () => {
@@ -64,25 +67,26 @@ const Transactions = () => {
             const expenses = ((await response.json()) as Expense[] | null) ?? [];
             return expenses.map((expense) => ({
               key: `expense-${expense.id}`,
+              id: expense.id,
               title: expense.title?.trim() || "Untitled Expense",
               subtitle: `Category budget: ${formatCentsToEuro(category.total)} €`,
               category: category.name,
               type: "Expense" as const,
               amount: -Math.abs(expense.value),
-              recordLabel: `Record #${expense.id}`,
               order: expense.id,
+              categoryId: category.category_id,
             }));
           })
         );
 
         const depositItems: TransactionItem[] = deposits.map((deposit) => ({
           key: `deposit-${deposit.id}`,
+          id: deposit.id,
           title: deposit.title?.trim() || "Balance Deposit",
           subtitle: "Added to account balance",
           category: "Balance",
           type: "Deposit",
           amount: Math.abs(deposit.value),
-          recordLabel: `Record #${deposit.id}`,
           order: deposit.id,
         }));
 
@@ -129,12 +133,50 @@ const Transactions = () => {
     return ["All", ...Array.from(unique)];
   }, [transactions]);
 
+  const handleDeleteTransaction = async (item: TransactionItem) => {
+    const shouldDelete = window.confirm(`Delete this ${item.type.toLowerCase()} entry?`);
+    if (!shouldDelete) {
+      return;
+    }
+
+    try {
+      setDeletingKey(item.key);
+      setActionStatus("");
+
+      if (item.type === "Expense" && !item.categoryId) {
+        throw new Error("Missing category for expense deletion.");
+      }
+
+      const endpoint =
+        item.type === "Deposit"
+          ? apiPaths.depositById(item.id)
+          : apiPaths.expenseByCategoryAndId(item.categoryId as number, item.id);
+
+      const response = await customFetch(endpoint, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed with status ${response.status}`);
+      }
+
+      setTransactions((prev) => prev.filter((tx) => tx.key !== item.key));
+      setUpdateBalance((prev) => !prev);
+      setActionStatus(`${item.type} deleted.`);
+    } catch (deleteError) {
+      console.error("Delete transaction failed", deleteError);
+      setActionStatus(`Failed to delete ${item.type.toLowerCase()}.`);
+    } finally {
+      setDeletingKey("");
+    }
+  };
+
   return (
     <section className="page-section">
-      <div className="tx-header">
-        <div>
+      <header className="dashboard-header tx-header">
+        <div className="tx-heading-copy">
           <h1 className="dashboard-title">Transaction Center</h1>
-          <p className="dashboard-subtitle">Detailed history of your financial architecture.</p>
+          <p className="dashboard-subtitle">A clear history of every move.</p>
         </div>
         <div className="tx-balance-card">
           <p className="stat-label">Available Balance</p>
@@ -143,7 +185,7 @@ const Transactions = () => {
             <div className="micro-progress-fill micro-progress-fill-safe" style={{ width: "74%" }} />
           </div>
         </div>
-      </div>
+      </header>
 
       <div className="tx-filters">
         <input
@@ -167,6 +209,17 @@ const Transactions = () => {
       </div>
 
       {error && <p className="status-pill status-pill-error">{error}</p>}
+      {!error && actionStatus && (
+        <p
+          className={
+            /failed/i.test(actionStatus)
+              ? "status-pill status-pill-error"
+              : "status-pill status-pill-success"
+          }
+        >
+          {actionStatus}
+        </p>
+      )}
       {isLoading && (
         <div className="center-state">
           <span className="spinner" />
@@ -185,9 +238,9 @@ const Transactions = () => {
               <tr>
                 <th>Transaction</th>
                 <th>Category</th>
-                <th>Reference</th>
-                <th>Status</th>
+                <th>Type</th>
                 <th className="amount-col">Amount</th>
+                <th className="amount-col">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -200,13 +253,28 @@ const Transactions = () => {
                   <td>
                     <span className="tx-badge">{item.category}</span>
                   </td>
-                  <td className="tx-muted">{item.recordLabel}</td>
                   <td>
-                    <span className="tx-status">Completed</span>
+                    <span
+                      className={`tx-type ${
+                        item.type === "Deposit" ? "tx-type-deposit" : "tx-type-expense"
+                      }`}
+                    >
+                      {item.type}
+                    </span>
                   </td>
                   <td className={`amount-col ${item.amount >= 0 ? "tx-positive" : "tx-negative"}`}>
                     {item.amount >= 0 ? "+" : "-"}
                     {formatCentsToEuro(Math.abs(item.amount))} €
+                  </td>
+                  <td className="amount-col">
+                    <button
+                      type="button"
+                      className="table-delete-btn"
+                      onClick={() => handleDeleteTransaction(item)}
+                      disabled={deletingKey === item.key}
+                    >
+                      {deletingKey === item.key ? "Deleting..." : "Delete"}
+                    </button>
                   </td>
                 </tr>
               ))}

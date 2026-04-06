@@ -64,7 +64,7 @@ const UserProfile = () => {
     <section className="page-section">
       <header className="dashboard-header">
         <h1 className="dashboard-title">Overview</h1>
-        <p className="dashboard-subtitle">Real-time fiscal monitoring and performance.</p>
+        <p className="dashboard-subtitle">See your money in one place.</p>
       </header>
 
       <div className="dashboard-stats">

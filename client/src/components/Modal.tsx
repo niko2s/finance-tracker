@@ -10,10 +10,10 @@ const Modal = ({ id, onClose, children }: ModalProps) => {
   return (
     <dialog id={id} className="ft-modal" onCancel={handleClose}>
       <div className="ft-modal-inner">
-        <div className="form-grid">
-          <button type="button" className="ft-modal-close" onClick={handleClose} aria-label="Close modal">
-            x
-          </button>
+        <button type="button" className="ft-modal-close" onClick={handleClose} aria-label="Close modal">
+          x
+        </button>
+        <div className="ft-modal-body">
           {children}
         </div>
       </div>
