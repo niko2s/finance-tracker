@@ -5,6 +5,7 @@ import FormField from "../components/FormField";
 import apiPaths from "../api/paths";
 import useCustomFetch from "../hooks/customFetch";
 import { formatCentsToEuro, parseEuroInputToCents } from "../utils/money";
+import { Link } from "react-router-dom";
 
 const AddBalance = () => {
   const [title, setTitle] = useState("");
@@ -60,16 +61,32 @@ const AddBalance = () => {
 
   return (
     <section className="page-section">
+      <div className="form-page-header">
+        <Link className="soft-btn" to="/dashboard">
+          Back
+        </Link>
+        <p className="form-page-copy">
+          Add money to your account balance. You can include a short title so it is easy to find later.
+        </p>
+      </div>
       <AddForm
         title="Add Balance"
         handleSubmit={handleSubmit}
         status={status}
         submitLabel="Confirm Deposit"
       >
-        <FormField name="Title" type="text" state={title} setState={setTitle} />
+        <FormField
+          name="Title"
+          info="Optional. Example: Salary, Transfer, Refund"
+          placeholder="e.g. Salary"
+          type="text"
+          state={title}
+          setState={setTitle}
+        />
         <FormField
           name="Value"
           info={`Current balance: ${formatCentsToEuro(balance)} €`}
+          placeholder="e.g. 2,500.00"
           type="number"
           required={true}
           state={value}

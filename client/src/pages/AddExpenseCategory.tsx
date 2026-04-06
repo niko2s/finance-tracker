@@ -5,6 +5,7 @@ import FormField from "../components/FormField";
 import useCustomFetch from "../hooks/customFetch";
 import apiPaths from "../api/paths";
 import { parseEuroInputToCents } from "../utils/money";
+import { Link } from "react-router-dom";
 
 const AddExpenseCategory = () => {
   const [title, setTitle] = useState("");
@@ -69,6 +70,14 @@ const AddExpenseCategory = () => {
 
   return (
     <section className="page-section">
+      <div className="form-page-header">
+        <Link className="soft-btn" to="/dashboard">
+          Back
+        </Link>
+        <p className="form-page-copy">
+          Create a category and set a monthly limit so your spending stays easy to track.
+        </p>
+      </div>
       <AddForm
         title="Create Expense Category"
         handleSubmit={handleSubmit}
@@ -77,6 +86,8 @@ const AddExpenseCategory = () => {
       >
         <FormField
           name="Title"
+          info="Use a clear name. Example: Groceries, Rent, Transport"
+          placeholder="e.g. Groceries"
           type="text"
           required={true}
           state={title}
@@ -84,6 +95,8 @@ const AddExpenseCategory = () => {
         />
         <FormField
           name="Limit"
+          info="Monthly limit for this category. Example: 400.00"
+          placeholder="e.g. 400.00"
           type="number"
           required={true}
           state={value}

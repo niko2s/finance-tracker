@@ -134,7 +134,7 @@ const Management = () => {
       <header className="dashboard-header">
         <h1 className="dashboard-title">Management Center</h1>
         <p className="dashboard-subtitle">
-          Configure your financial infrastructure with surgical precision.
+          Set up categories and balance in seconds.
         </p>
       </header>
 
@@ -147,8 +147,10 @@ const Management = () => {
           </label>
           <input
             id="deposit-value"
+            type="text"
+            inputMode="decimal"
             className="management-input management-input-money"
-            placeholder="0,00"
+            placeholder="0.00"
             value={depositValue}
             onChange={(e) => setDepositValue(e.target.value)}
           />
@@ -159,7 +161,7 @@ const Management = () => {
           <input
             id="deposit-title"
             className="management-input"
-            placeholder="e.g. Monthly salary transfer"
+            placeholder="e.g. Salary"
             value={depositTitle}
             onChange={(e) => setDepositTitle(e.target.value)}
           />
@@ -189,7 +191,7 @@ const Management = () => {
           <input
             id="category-title"
             className="management-input"
-            placeholder="e.g. Premium Travel"
+            placeholder="e.g. Groceries"
             value={categoryTitle}
             onChange={(e) => setCategoryTitle(e.target.value)}
           />
@@ -199,14 +201,16 @@ const Management = () => {
           </label>
           <input
             id="category-limit"
+            type="text"
+            inputMode="decimal"
             className="management-input management-input-money"
-            placeholder="5.000,00"
+            placeholder="5,000.00"
             value={categoryLimit}
             onChange={(e) => setCategoryLimit(e.target.value)}
           />
 
           <div className="management-info">
-            Categories help you track spending trends. Limits are calculated against each category total.
+            Set a limit for each category to track your spending.
           </div>
 
           <button className="gradient-btn management-submit" type="submit" disabled={isCategorySubmitting}>

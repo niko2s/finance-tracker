@@ -130,20 +130,20 @@ const ExpenseCard = ({
             >
               History
             </Link>
-          <button
-            onClick={() => {
-              const dialog = document.getElementById(
-                `modal-${category_id}`
-              ) as HTMLDialogElement | null;
-              dialog?.showModal();
-            }}
-            className="category-inline-link"
-            disabled={isSubmitting}
-            aria-label={`Add expense to ${name}`}
-          >
-            <i className="material-icons">add_circle</i>
-            Add expense
-          </button>
+            <button
+              onClick={() => {
+                const dialog = document.getElementById(
+                  `modal-${category_id}`
+                ) as HTMLDialogElement | null;
+                dialog?.showModal();
+              }}
+              className="category-inline-link"
+              disabled={isSubmitting}
+              aria-label={`Add expense to ${name}`}
+            >
+              <i className="material-icons">add_circle</i>
+              Add expense
+            </button>
           </div>
         </div>
       </article>
@@ -168,6 +168,8 @@ const ExpenseCard = ({
 
           <FormField
             name="Value (€)"
+            info="Use format like 1,234.56"
+            placeholder="e.g. 45.90"
             type="number"
             required={true}
             state={value}
