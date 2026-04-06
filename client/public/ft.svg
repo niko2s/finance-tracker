@@ -1,0 +1,21 @@
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .bg { fill: #ffffff; }
+    .b { fill: none; stroke: #d9deea; stroke-width: 8; }
+    .f { fill: #000000; }
+    .t { fill: #1E6FFF; }
+  </style>
+
+  <rect x="12" y="12" width="232" height="232" rx="28" class="bg" />
+  <rect x="12" y="12" width="232" height="232" rx="28" class="b" />
+
+  <!-- F -->
+  <text x="20" y="180" font-family="Inter, Arial, sans-serif" font-weight="900" font-size="160" class="f">
+    F
+  </text>
+
+  <!-- T -->
+  <text x="110" y="180" font-family="Inter, Arial, sans-serif" font-weight="900" font-size="160" class="t">
+    T
+  </text>
+</svg>
