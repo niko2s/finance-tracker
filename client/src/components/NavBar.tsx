@@ -1,15 +1,12 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import apiPaths from "../api/paths";
 import { useUser } from "../context/UserContext";
 import useCustomFetch from "../hooks/customFetch";
-import { formatCentsToEuro } from "../utils/money";
 
 const NavBar = () => {
   const customFetch = useCustomFetch();
-  const { user, setUser, balance } = useUser();
+  const { user, setUser } = useUser();
   const navigate = useNavigate();
-
-  const formattedBalance = formatCentsToEuro(balance);
 
   const handleLogout = async () => {
     try {
@@ -29,35 +26,43 @@ const NavBar = () => {
   };
 
   return (
-    <div className="navbar bg-base-300 mb-8">
-      <div className="navbar-start">
-        {user && (
-          <div className="flex items-center space-x-3 ml-4 md:ml-12">
-            <p className="text-xl">{formattedBalance} €</p>
-            <Link className="btn btn-ghost" to="/add-balance" aria-label="Add balance">
-              <i className="material-icons">add</i>
-            </Link>
-          </div>
-        )}
+    <header className="ft-navbar">
+      <div className="ft-navbar-inner">
+        <div className="ft-brand-wrap">
+          <Link className="ft-brand" to={user ? "/dashboard" : "/login"}>
+            Finance Tracker
+          </Link>
+          {user && (
+            <nav className="ft-nav-links" aria-label="Primary">
+              <NavLink to="/dashboard" className={({ isActive }) => `ft-nav-link ${isActive ? "active" : ""}`}>
+                Dashboard
+              </NavLink>
+              <NavLink to="/transactions" className={({ isActive }) => `ft-nav-link ${isActive ? "active" : ""}`}>
+                Transactions
+              </NavLink>
+              <NavLink to="/management" className={({ isActive }) => `ft-nav-link ${isActive ? "active" : ""}`}>
+                Management
+              </NavLink>
+            </nav>
+          )}
+        </div>
+        <div className="ft-navbar-right">
+          {user && (
+            <>
+              <Link className="ft-primary-btn" to="/add-balance" aria-label="Add balance">
+                Add Balance
+              </Link>
+              <div className="ft-avatar" aria-hidden="true">
+                {user.username.slice(0, 1).toUpperCase()}
+              </div>
+              <button className="ft-logout-link" onClick={handleLogout} aria-label="Log out">
+                Logout
+              </button>
+            </>
+          )}
+        </div>
       </div>
-
-      <div className="navbar-center">
-        <Link className="btn btn-ghost text-2xl md:text-3xl" to={user ? "/dashboard" : "/login"}>
-          Finance Tracker
-        </Link>
-      </div>
-
-      <div className="navbar-end">
-        {user && (
-          <div className="flex items-center space-x-3 mr-4 md:mr-12">
-            <p className="text-xl">Hello, {user.username}</p>
-            <button className="btn btn-ghost" onClick={handleLogout} aria-label="Log out">
-              <i className="material-icons">logout</i>
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
+    </header>
   );
 };
 

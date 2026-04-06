@@ -44,41 +44,52 @@ const ExpenseCategory = () => {
   }, [customFetch, id]);
 
   return (
-    <>
+    <section className="history-shell">
+      <header className="dashboard-header" style={{ marginBottom: "1rem" }}>
+        <h1 className="dashboard-title">Category Transactions</h1>
+        <p className="dashboard-subtitle">Line items for this category.</p>
+      </header>
       {isLoading && (
-        <div className="flex justify-center py-8">
-          <span className="loading loading-spinner loading-md" />
+        <div className="center-state">
+          <span className="spinner" />
         </div>
       )}
       {!isLoading && error && (
-        <p className="text-lg font-semibold text-center mt-8 text-error">
-          {error}
-        </p>
+        <p className="status-pill status-pill-error">{error}</p>
       )}
       {!isLoading && !error && expenses.length === 0 && (
-        <p className="text-lg font-semibold text-center mt-8">
-          No expenses yet!
-        </p>
-      )}
-      {!isLoading && !error && expenses.length > 0 && (
-        <div className="max-w-md mx-auto">
-          <div className="flex justify-between py-2 border-b border-base-content text-lg font-semibold mt-8">
-            <span>Title</span>
-            <span>Value</span>
-          </div>
-          <ul className="divide-y divide-base-content">
-            {expenses.map((e: Expense) => {
-              return (
-                <li key={e.id} className="flex justify-between py-4">
-                  <span className="text-lg">{e.title || "Untitled"}</span>
-                  <span className="text-lg">{formatCentsToEuro(e.value)} €</span>
-                </li>
-              );
-            })}
-          </ul>
+        <div className="center-state">
+          <p className="subtle-copy">No expenses yet!</p>
         </div>
       )}
-    </>
+      {!isLoading && !error && expenses.length > 0 && (
+        <div className="tx-table-wrap">
+          <table className="tx-table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Reference</th>
+                <th className="amount-col">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+            {expenses.map((e: Expense) => {
+              return (
+                <tr key={e.id}>
+                  <td>
+                    <p className="tx-title">{e.title || "Untitled"}</p>
+                    <p className="tx-subtitle">Expense record</p>
+                  </td>
+                  <td className="tx-muted">Record #{e.id}</td>
+                  <td className="amount-col tx-negative">-{formatCentsToEuro(e.value)} €</td>
+                </tr>
+              );
+            })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
   );
 };
 

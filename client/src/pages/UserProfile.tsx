@@ -5,9 +5,10 @@ import { Link } from "react-router-dom";
 import { ExpenseOverview } from "../types";
 import useCustomFetch from "../hooks/customFetch";
 import apiPaths from "../api/paths";
+import { formatCentsToEuro } from "../utils/money";
 
 const UserProfile = () => {
-  const { user, updateBalance } = useUser();
+  const { user, updateBalance, balance } = useUser();
 
   const customFetch = useCustomFetch();
   const [expenseOverviews, setExpenseOverviews] = useState<ExpenseOverview[]>(
@@ -50,32 +51,72 @@ const UserProfile = () => {
     void fetchData();
   }, [customFetch, updateBalance, user]);
 
+  const totalSpent = expenseOverviews.reduce(
+    (sum, item) => sum + (item.expense_sum?.Int64 ?? 0),
+    0
+  );
+  const totalDeposited = balance + totalSpent;
+  const overBudgetCount = expenseOverviews.reduce((sum, item) => {
+    return sum + ((item.expense_sum?.Int64 ?? 0) > item.total ? 1 : 0);
+  }, 0);
+
   return (
-    <div>
-      <div className="my-3 flex justify-center">
-        <Link
-          to="/add-expense-category"
-          className="btn inline-flex items-center border solid border-primary p-2 rounded"
-        >
-          <i className="material-icons">add</i>
-          <span>Category</span>
-        </Link>
+    <section className="page-section">
+      <header className="dashboard-header">
+        <h1 className="dashboard-title">Overview</h1>
+        <p className="dashboard-subtitle">Real-time fiscal monitoring and performance.</p>
+      </header>
+
+      <div className="dashboard-stats">
+        <div className="stat-card">
+          <p className="stat-label">Total Balance</p>
+          <p className="stat-value">
+            {formatCentsToEuro(balance)} €
+          </p>
+        </div>
+        <div className="stat-card">
+          <p className="stat-label">Total Deposited</p>
+          <p className="stat-value">
+            {formatCentsToEuro(totalDeposited)} €
+          </p>
+        </div>
+        <div className="stat-card">
+          <p className="stat-label">Total Spent</p>
+          <p className="stat-value">
+            {formatCentsToEuro(totalSpent)} €
+          </p>
+        </div>
+        <div className="stat-card">
+          <p className="stat-label">Over Budget</p>
+          <p className="stat-value stat-value-danger">{String(overBudgetCount).padStart(2, "0")}</p>
+          <p className="over-budget-inline">Categories</p>
+        </div>
       </div>
 
-      {error && <p className="text-center text-error">{error}</p>}
+      <div className="dashboard-toolbar">
+        <h2 className="section-title">Expense Categories</h2>
+        <div className="toolbar-actions">
+          <Link to="/add-expense-category" className="soft-btn">New Category</Link>
+          <Link to="/management" className="soft-btn">Management</Link>
+        </div>
+      </div>
+
+      {error && <p className="status-pill status-pill-error">{error}</p>}
       {isLoading && (
-        <div className="flex justify-center py-6">
-          <span className="loading loading-spinner loading-md" />
+        <div className="center-state">
+          <span className="spinner" />
         </div>
       )}
       {!isLoading && !error && expenseOverviews.length === 0 && (
-        <p className="text-center py-6">No expense categories yet.</p>
+        <div className="center-state">
+          <p className="subtle-copy">No expense categories yet.</p>
+        </div>
       )}
 
-      <ul className="flex flex-wrap items-center justify-center">
+      <ul className="dashboard-grid">
         {expenseOverviews?.map((ec: ExpenseOverview) => {
           return (
-            <li key={ec.category_id} className="w-96 h-48 mx-2 my-5">
+            <li key={ec.category_id}>
               <ExpenseCard
                 category_id={ec.category_id}
                 name={ec.name}
@@ -86,7 +127,7 @@ const UserProfile = () => {
           );
         })}
       </ul>
-    </div>
+    </section>
   );
 };
 

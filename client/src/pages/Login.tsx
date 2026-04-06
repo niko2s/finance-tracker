@@ -136,67 +136,79 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="max-w-md w-full">
-        <h2 className="mt-6 text-center text-3xl font-bold">
-          {isLogin ? "Sign in" : "Register"}
-        </h2>
+    <div className="auth-wrap">
+      <div className="auth-hero">
+        <p className="auth-kicker">Finance Tracker</p>
+        <h1 className="auth-display">
+          Money,
+          <span>Made Clear.</span>
+        </h1>
+        <p className="auth-copy">
+          Plan budgets, track expenses, and keep every transaction in one place.
+        </p>
+      </div>
+      <div className="auth-card">
+        <div className="auth-inner">
+          <h2 className="auth-title">{isLogin ? "Sign in" : "Create Account"}</h2>
 
-        <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
-          {!isLogin && (<FormField
-            name="Username"
-            type="text"
-            required={true}
-            state={username}
-            setState={setUsername}
-          />)}
+          <form className="form-grid" style={{ marginTop: "1rem" }} onSubmit={handleSubmit}>
+            {!isLogin && (
+              <FormField
+                name="Username"
+                type="text"
+                required={true}
+                state={username}
+                setState={setUsername}
+              />
+            )}
 
-          <FormField
-            name="Email"
-            type="email"
-            required={true}
-            state={email}
-            setState={setEmail}
-          />
+            <FormField
+              name="Email"
+              type="email"
+              required={true}
+              state={email}
+              setState={setEmail}
+            />
 
-          <FormField
-            name="Password"
-            type="password"
-            required={true}
-            state={password}
-            setState={setPassword}
-          />
+            <FormField
+              name="Password"
+              type="password"
+              required={true}
+              state={password}
+              setState={setPassword}
+            />
 
-          {message.message && (
-            <div
-              className={`text-sm text-center mt-2 ${
-                message.color === "red" ? "text-red-500" : "text-secondary"
-              }`}
-            >
-              {message.message}
-            </div>
-          )}
+            {message.message && (
+              <p
+                className={
+                  message.color === "red"
+                    ? "status-pill status-pill-error"
+                    : "status-pill status-pill-neutral"
+                }
+              >
+                {message.message}
+              </p>
+            )}
 
-          <div>
-            <button type="submit" className="btn btn-primary w-full" disabled={isSubmitting}>
-              {isSubmitting ? "Please wait..." : isLogin ? "Sign in" : "Register"}
+            <button type="submit" className="gradient-btn" disabled={isSubmitting}>
+              {isSubmitting ? "Please wait..." : isLogin ? "Sign In" : "Create Account"}
             </button>
-          </div>
-        </form>
+          </form>
 
-        <button
-          type="button"
-          className="text-primary mt-4"
-          onClick={() => {
-            setIsLogin((isLogin) => !isLogin);
-            setMessage({ message: "", color: "default" });
-          }}
-          disabled={isSubmitting}
-        >
-          {isLogin
-            ? "Need an account? Register"
-            : "Already have an account? Sign in"}
-        </button>
+          <button
+            type="button"
+            className="text-link-btn"
+            onClick={() => {
+              setIsLogin((current) => !current);
+              setMessage({ message: "", color: "default" });
+            }}
+            disabled={isSubmitting}
+          >
+            {isLogin
+              ? "Need an account? Register"
+              : "Already have an account? Sign in"}
+          </button>
+        </div>
       </div>
     </div>
   );

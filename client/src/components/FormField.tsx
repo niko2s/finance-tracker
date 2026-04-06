@@ -22,26 +22,22 @@ const FormField = ({
   const inputId = `${inputName}-${generatedId}`;
 
   return (
-    <div className="form-control w-full">
-      <label className="label" htmlFor={inputId}>
-        <span className="label-text">
-          {name} {required && <span className="text-error">*</span>}
-        </span>
+    <div className="field-wrap">
+      <label className="field-label" htmlFor={inputId}>
+        {name} {required && <span className="required-star">*</span>}
       </label>
       <input
         id={inputId}
         name={inputName}
         type={type}
-        className="input input-bordered w-full"
+        className="field-input"
         value={state}
         onChange={(e) => setState(e.target.value)}
         required={required}
         step={type === "number" ? "0.01" : undefined}
       />
       {info && (
-        <label className="label">
-          <span className="label-text-alt">{info}</span>
-        </label>
+        <p className="field-help">{info}</p>
       )}
     </div>
   );

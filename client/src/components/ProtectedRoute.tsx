@@ -6,8 +6,8 @@ const ProtectedRoute = () => {
 
   if (isAuthLoading) {
     return (
-      <div className="flex min-h-[40vh] items-center justify-center">
-        <span className="loading loading-spinner loading-md" />
+      <div className="center-state" style={{ minHeight: "40vh" }}>
+        <span className="spinner" />
       </div>
     );
   }

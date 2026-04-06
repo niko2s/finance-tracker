@@ -81,52 +81,72 @@ const ExpenseCard = ({
   };
 
   // Calculate width of progressbar.
-  let withinLimit = true;
   let widthPercentage = 0;
+  let ratio = 0;
   if (total > 0) {
-    const ratio = spent / total;
+    ratio = spent / total;
     widthPercentage = Math.min(ratio * 100, 100);
-    if (ratio > 1) withinLimit = false;
   }
+  const statusTone =
+    ratio > 1 ? "over" : ratio >= 0.85 ? "warning" : "safe";
+  const remaining = total - spent;
+  const remainingPct = total > 0 ? Math.max(0, ((total - spent) / total) * 100) : 0;
 
   return (
     <>
-      <div className="card w-96 bg-base-300 shadow-xl">
-        <div className="card-body">
-          <h2 className="card-title">{name}</h2>
-
-          <p className="text-end">
-            {formatCentsToEuro(spent)}/{formatCentsToEuro(total)}€
-          </p>
-          <progress
-            className={`progress w-full mt-1 mb-3 ${
-              withinLimit ? "progress-primary" : "progress-error"
-            }`}
-            value={widthPercentage}
-            max="100"
+      <article className="category-card">
+        <div className="category-head">
+          <div>
+            <h2 className="category-title">{name}</h2>
+            <p className="category-budget">
+              {formatCentsToEuro(spent)} of {formatCentsToEuro(total)} €
+            </p>
+          </div>
+          <span className={`status-badge status-badge-${statusTone}`}>
+            {statusTone === "safe"
+              ? "Safe"
+              : statusTone === "warning"
+                ? "Warning"
+                : "Over Budget"}
+          </span>
+        </div>
+        <div className="micro-progress-track" aria-label={`${name} budget usage`}>
+          <div
+            className={`micro-progress-fill micro-progress-fill-${statusTone}`}
+            style={{ width: `${widthPercentage}%` }}
           />
-          <div className="card-actions justify-between">
+        </div>
+        <div className="category-footer">
+          <span className={`remaining-copy ${remaining < 0 ? "remaining-copy-over" : ""}`}>
+            {remaining < 0
+              ? `-${formatCentsToEuro(Math.abs(remaining))} Exceeded`
+              : `${Math.round(remainingPct * 10) / 10}% Remaining`}
+          </span>
+          <div className="category-actions">
             <Link
               to={`/expense-category/${category_id}`}
-              className="btn btn-outline inline-flex items-center"
+              className="history-link"
+              aria-label={`Open ${name} history`}
             >
-              <i className="material-icons">history</i>
+              History
             </Link>
-            <button
-              onClick={() => {
-                const dialog = document.getElementById(
-                  `modal-${category_id}`
-                ) as HTMLDialogElement | null;
-                dialog?.showModal();
-              }}
-              className="btn btn-outline inline-flex items-center"
-              disabled={isSubmitting}
-            >
-              <i className="material-icons">add</i>
-            </button>
+          <button
+            onClick={() => {
+              const dialog = document.getElementById(
+                `modal-${category_id}`
+              ) as HTMLDialogElement | null;
+              dialog?.showModal();
+            }}
+            className="category-inline-link"
+            disabled={isSubmitting}
+            aria-label={`Add expense to ${name}`}
+          >
+            <i className="material-icons">add_circle</i>
+            Add expense
+          </button>
           </div>
         </div>
-      </div>
+      </article>
 
       <Modal id={`modal-${category_id}`} onClose={() => {
         setStatus("");
@@ -137,6 +157,7 @@ const ExpenseCard = ({
           title={`Add an expense to ${name}`}
           handleSubmit={handleSubmit}
           status={status}
+          submitLabel="Add Expense"
         >
           <FormField
             name="Title"
@@ -152,6 +173,7 @@ const ExpenseCard = ({
             state={value}
             setState={setValue}
           />
+          {isSubmitting && <p className="subtle-copy">Submitting...</p>}
         </AddForm>
       </Modal>
     </>

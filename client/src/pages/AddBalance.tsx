@@ -59,8 +59,13 @@ const AddBalance = () => {
   };
 
   return (
-    <div className="mt-6">
-      <AddForm title="Add balance" handleSubmit={handleSubmit} status={status}>
+    <section className="page-section">
+      <AddForm
+        title="Add Balance"
+        handleSubmit={handleSubmit}
+        status={status}
+        submitLabel="Confirm Deposit"
+      >
         <FormField name="Title" type="text" state={title} setState={setTitle} />
         <FormField
           name="Value"
@@ -70,9 +75,9 @@ const AddBalance = () => {
           state={value}
           setState={setValue}
         />
-        {isSubmitting && <p className="text-sm">Submitting...</p>}
+        {isSubmitting && <p className="subtle-copy">Submitting...</p>}
       </AddForm>
-    </div>
+    </section>
   );
 };
 

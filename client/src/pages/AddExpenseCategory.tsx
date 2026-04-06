@@ -68,11 +68,12 @@ const AddExpenseCategory = () => {
   };
 
   return (
-    <div className="mt-6">
+    <section className="page-section">
       <AddForm
-        title="Add new expense category"
+        title="Create Expense Category"
         handleSubmit={handleSubmit}
         status={status}
+        submitLabel="Create Category"
       >
         <FormField
           name="Title"
@@ -88,9 +89,9 @@ const AddExpenseCategory = () => {
           state={value}
           setState={setValue}
         />
-        {isSubmitting && <p className="text-sm">Submitting...</p>}
+        {isSubmitting && <p className="subtle-copy">Submitting...</p>}
       </AddForm>
-    </div>
+    </section>
   );
 };
 
